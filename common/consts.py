@@ -14,3 +14,13 @@ class VerdictResult(IntEnum):
     OLE = 1 << 4  # Output Limit Exceeded
     CE = 1 << 5  # Compile Error
     IE = 1 << 30  # Internal Error
+
+
+class LanguageEnum(IntEnum):
+    CPP = 1
+    C = 2
+    Java = 3
+    Python2 = 4
+    Python3 = 5
+    Go = 6
+    JavaScript = 7
