@@ -2,7 +2,8 @@ from enum import IntEnum
 
 
 class CheckerType(IntEnum):
-    pass
+    EXACTLY_SAME = 0
+    DOUBLE = 1
 
 
 class VerdictResult(IntEnum):
