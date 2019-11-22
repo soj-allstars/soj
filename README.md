@@ -1,1 +1,1 @@
-# soj - Shantou(Shit) Open Judge
+# soj - STU(Shit) Open Judge
