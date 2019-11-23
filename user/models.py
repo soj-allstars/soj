@@ -5,10 +5,14 @@ from common.models import Language
 from common.consts import VerdictResult
 
 
+class UserInfo(models.Model):
+    pass
+
+
 class Submission(models.Model):
     VERDICT_CHOICES = [(v.value, v.name) for v in VerdictResult]
 
-    user = models.ForeignKey(get_user_model(), models.DO_NOTHING)  # TODO: use customized user model instead
+    user = models.ForeignKey(get_user_model(), models.DO_NOTHING)
     problem = models.ForeignKey(Problem, models.DO_NOTHING)
     submit_time = models.DateTimeField()
     code = models.TextField()
@@ -16,4 +20,4 @@ class Submission(models.Model):
     time = models.IntegerField(help_text='In ms')
     memory = models.IntegerField(help_text='In KB')
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES)
-    outputs = models.TextField(help_text='formatted in JSON')
+    outputs = models.TextField(help_text='a list formatted in JSON')

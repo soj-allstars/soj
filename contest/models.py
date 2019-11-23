@@ -8,3 +8,5 @@ class Contest(models.Model):
     problems = models.ManyToManyField(Problem)
     Announcement = models.TextField()
     users = models.ManyToManyField(get_user_model())
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
