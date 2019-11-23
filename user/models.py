@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from problemset.models import Problem
-from common.models import Language
-from common.consts import VerdictResult
+from common.consts import VerdictResult, LanguageEnum
 
 
 class UserInfo(models.Model):
@@ -16,7 +15,7 @@ class Submission(models.Model):
     problem = models.ForeignKey(Problem, models.DO_NOTHING)
     submit_time = models.DateTimeField()
     code = models.TextField()
-    lang = models.ForeignKey(Language, models.DO_NOTHING)
+    lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     time = models.IntegerField(help_text='In ms')
     memory = models.IntegerField(help_text='In KB')
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES)

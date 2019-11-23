@@ -6,7 +6,7 @@ from problemset.models import Problem
 class Contest(models.Model):
     name = models.CharField(max_length=255)
     problems = models.ManyToManyField(Problem)
-    Announcement = models.TextField()
+    Announcement = models.TextField(blank=True)
     users = models.ManyToManyField(get_user_model())
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
