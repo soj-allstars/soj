@@ -1,4 +1,4 @@
-Django==2.1
+Django==2.1.11
 djangorestframework==3.10.3
 PyMySQL==0.9.3
 pytz==2019.3
