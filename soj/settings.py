@@ -22,15 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '-h0m96a@zxm57o_wej@b^dq-+jsmx9o1v2z++k)yq8^i*1+f9g'
 
-IS_PRO = os.environ.get("PRO")
-
-if IS_PRO:
-    DEBUG = False
-else:
-    DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+JUDGER_ADDR = ('127.0.0.1, 2333')
 
 # Application definition
 
