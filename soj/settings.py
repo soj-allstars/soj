@@ -26,7 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-JUDGER_ADDR = ('127.0.0.1, 2333')
+REDIS_HOST = ('127.0.0.1, 2333')
 
 # Application definition
 

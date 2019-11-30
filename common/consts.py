@@ -1,11 +1,13 @@
-from enum import IntEnum
+from enum import IntEnum, unique
 
 
+@unique
 class CheckerType(IntEnum):
     EXACTLY_SAME = 0
     DOUBLE = 1
 
 
+@unique
 class VerdictResult(IntEnum):
     AC = 0  # Accepted
     WA = 1  # Wrong Answer
@@ -17,6 +19,7 @@ class VerdictResult(IntEnum):
     IE = 1 << 30  # Internal Error
 
 
+@unique
 class LanguageEnum(IntEnum):
     CPP = 1
     C = 2
