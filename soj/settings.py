@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from redis import Redis
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,9 +25,13 @@ SECRET_KEY = '-h0m96a@zxm57o_wej@b^dq-+jsmx9o1v2z++k)yq8^i*1+f9g'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # need to change in product
 
-REDIS_HOST = ('127.0.0.1, 2333')
+redis = Redis(
+    os.environ.get('REDIS_HOST', ''),
+    os.environ.get('REDIS_PORT', 6379),
+    password=os.environ.get('REDIS_PASSWORD', None)
+)
 
 # Application definition
 
@@ -37,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'common',
     'problemset',
     'contest',
     'user',
@@ -58,7 +62,7 @@ ROOT_URLCONF = 'soj.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,3 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]

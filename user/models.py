@@ -20,3 +20,4 @@ class Submission(models.Model):
     memory = models.IntegerField(help_text='In KB', null=True)
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, null=True)
     outputs = models.TextField(help_text='a list formatted in JSON', null=True)
+    job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True)
