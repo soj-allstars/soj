@@ -19,5 +19,6 @@ class Submission(models.Model):
     time = models.IntegerField(help_text='In ms', null=True)
     memory = models.IntegerField(help_text='In KB', null=True)
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, null=True)
+    desc = models.CharField(max_length=255, blank=True)
     outputs = models.TextField(help_text='a list formatted in JSON', null=True)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True)
