@@ -7,9 +7,9 @@ import logging
 
 @api_view(['POST'])
 def judge_finished(request):
+    sub_id = request.POST.get('sub_id')
     result = request.POST.get('result')
 
-    sub_id = result['sub_id']
     try:
         submission = Submission.objects.get(id=sub_id)
     except Submission.DoesNotExist:
