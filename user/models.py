@@ -13,7 +13,7 @@ class Submission(models.Model):
 
     user = models.ForeignKey(get_user_model(), models.DO_NOTHING)
     problem = models.ForeignKey(Problem, models.DO_NOTHING)
-    submit_time = models.DateTimeField()
+    submit_time = models.DateTimeField(auto_now_add=True)
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     time = models.IntegerField(help_text='In ms', null=True)

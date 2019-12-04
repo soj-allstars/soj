@@ -25,3 +25,4 @@ class Solution(models.Model):
     problem = models.ForeignKey(Problem, models.CASCADE)
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
+    is_model_solution = models.BooleanField(default=False)

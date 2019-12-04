@@ -7,13 +7,13 @@ import logging
 
 @api_view(['POST'])
 def judge_finished(request):
-    sub_id = request.POST.get('sub_id')
+    submit_id = request.POST.get('submit_id')
     result = request.POST.get('result')
 
     try:
-        submission = Submission.objects.get(id=sub_id)
+        submission = Submission.objects.get(id=submit_id)
     except Submission.DoesNotExist:
-        logging.info(f'[judge_finished] submission does not exist. {sub_id=}')
+        logging.info(f'[judge_finished] submission does not exist. {submit_id=}')
         return HttpResponseBadRequest()
 
     submission.verdict = result['verdict']
