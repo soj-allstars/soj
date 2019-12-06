@@ -28,12 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']  # need to change in product
 
-redis = Redis(
-    os.environ.get('REDIS_HOST', ''),
+REDIS = Redis(
+    os.environ.get('REDIS_HOST', '47.106.140.231'),
     os.environ.get('REDIS_PORT', 6379),
     password=os.environ.get('REDIS_PASSWORD', None)
 )
-judge_q = Queue(connection=redis)
+JUDGE_Q = Queue(connection=REDIS)
 
 # Application definition
 

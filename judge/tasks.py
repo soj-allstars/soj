@@ -7,7 +7,7 @@ import logging
 def send_judge_request(problem, submission):  # TODO
     solution = Solution.objects.get(problem=problem, is_model_solution=True)  # catch exception outside
 
-    judge_job = settings.judge_q.enqueue(
+    judge_job = settings.JUDGE_Q.enqueue(
         'job_dealer.judge_submission',
         submit_id=submission.id,
         problem_id=problem.id,
