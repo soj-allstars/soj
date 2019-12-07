@@ -1,5 +1,6 @@
 from common.consts import LanguageEnum
-from django.http.response import JsonResponse
+from rest_framework.response import Response
+from rest_framework import status
 from django.views.generic import TemplateView
 from rest_framework.decorators import api_view
 from problemset.models import Problem
@@ -16,14 +17,13 @@ def get_problem_detail(request):
     try:
         problem_id = request.GET['pid']
     except KeyError:
-        return JsonResponse({'success': False, 'info': 'Kawaii make MY day!'})
+        return Response({'info': 'Kawaii make MY day! a.k.a. missing pid'}, status.HTTP_400_BAD_REQUEST)
 
     try:
         problem = Problem.objects.get(id=problem_id)
     except Problem.DoesNotExist:
-        return JsonResponse({'success': False, 'info': 'Invalid problem id'})
-    return JsonResponse({
-        'success': True,
+        return Response({'info': 'Invalid problem id'}, status.HTTP_400_BAD_REQUEST)
+    return Response({
         'title': problem.title,
         'time_limit': problem.time_limit,
         'memory_limit': problem.memory_limit,
@@ -41,7 +41,7 @@ def do_submission(request):
         code = request.POST['code']
         lang = request.POST['lang']
     except KeyError:
-        return JsonResponse({'success': False, 'info': 'God Bless You'})
+        return Response({'info': 'God Bless You a.k.a. missing parameter(s)'}, status.HTTP_400_BAD_REQUEST)
 
     try:
         submission = Submission()
@@ -52,6 +52,7 @@ def do_submission(request):
         submission.save()
     except Exception as exception:
         logging.error(f'[do_submission] {exception=}')
-        return JsonResponse({'success': False, 'info': 'something went wrong, please try again.'})
+        return Response({'info': 'something went wrong, please contact yjp.'},
+                        status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return JsonResponse({'success': True})
+    return Response()

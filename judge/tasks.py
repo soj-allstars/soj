@@ -4,7 +4,7 @@ from common.consts import LanguageEnum, CheckerType
 import logging
 
 
-def send_judge_request(problem, submission):  # TODO
+def send_judge_request(problem, submission):
     solution = Solution.objects.get(problem=problem, is_model_solution=True)  # catch exception outside
 
     judge_job = settings.JUDGE_Q.enqueue(
