@@ -1,15 +1,10 @@
 from common.consts import LanguageEnum
 from rest_framework.response import Response
 from rest_framework import status
-from django.views.generic import TemplateView
 from rest_framework.decorators import api_view
 from problemset.models import Problem
 from user.models import Submission
 import logging
-
-
-class QuestionDetail(TemplateView):
-    template_name = 'index.html'
 
 
 @api_view(['GET'])

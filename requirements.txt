@@ -1,8 +1,11 @@
 Click==7.0
 Django==2.1.14
+django-cors-headers==3.2.0
 djangorestframework==3.10.3
 PyMySQL==0.9.3
 pytz==2019.3
+PyYAML==5.2
 redis==3.3.11
 rq==1.1.0
 sqlparse==0.3.0
+uritemplate==3.0.0
