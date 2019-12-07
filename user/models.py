@@ -1,14 +1,16 @@
 from django.db import models
+from django_mysql.models import Model
+from django_mysql.models.fields import JSONField
 from django.contrib.auth import get_user_model
 from problemset.models import Problem
 from common.consts import VerdictResult, LanguageEnum
 
 
-class UserInfo(models.Model):
+class UserInfo(Model):
     pass
 
 
-class Submission(models.Model):
+class Submission(Model):
     VERDICT_CHOICES = [(v.value, v.name) for v in VerdictResult]
 
     user = models.ForeignKey(get_user_model(), models.DO_NOTHING)
@@ -20,5 +22,5 @@ class Submission(models.Model):
     memory = models.IntegerField(help_text='In KB', default=0)
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, null=True)
     desc = models.CharField(max_length=255, blank=True)
-    outputs = models.TextField(help_text='a list formatted in JSON', null=True)
+    outputs = JSONField(default=list)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True)

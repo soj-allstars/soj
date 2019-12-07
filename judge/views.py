@@ -20,7 +20,7 @@ def judge_finished(request):
     submission.desc = result.get('desc', '')
     submission.time = result['time_usage']
     submission.memory = result['memory_usage']
-    submission.outputs = json.dumps(result['outputs'])
+    submission.outputs = result['outputs']
     submission.save()
 
     return HttpResponse()

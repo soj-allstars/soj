@@ -1,9 +1,10 @@
 from django.db import models
+from django_mysql.models import Model
 from django.contrib.auth import get_user_model
 from problemset.models import Problem
 
 
-class Contest(models.Model):
+class Contest(Model):
     name = models.CharField(max_length=255)
     problems = models.ManyToManyField(Problem)
     Announcement = models.TextField(blank=True)
