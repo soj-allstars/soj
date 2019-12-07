@@ -1,7 +1,6 @@
 from rest_framework.decorators import api_view
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from user.models import Submission
-import json
 import logging
 
 
@@ -13,7 +12,7 @@ def judge_finished(request):
     try:
         submission = Submission.objects.get(id=submit_id)
     except Submission.DoesNotExist:
-        logging.info(f'[judge_finished] submission does not exist. {submit_id=}')
+        logging.warning(f'[judge_finished] submission does not exist. {submit_id=}')
         return HttpResponseBadRequest()
 
     submission.verdict = result['verdict']

@@ -17,13 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
-import problemset.urls
-import judge.urls
-import user.urls
+from problemset.urls import urlpatterns as problemset_apis
+from judge.urls import urlpatterns as judge_apis
+
+
+api_patterns = problemset_apis + judge_apis
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='index.html')),
     path('docs/', TemplateView.as_view(
         template_name='swagger-ui.html',
         extra_context={'schema_url': 'openapi-schema'}
@@ -32,7 +33,6 @@ urlpatterns = [
         title="soj",
         description="API for soj",
     ), name='openapi-schema'),
-    path('api/problem/', include(problemset.urls)),
-    path('api/judge/', include(judge.urls)),
-    path('api/submission/', include(user.urls)),
+    path('', TemplateView.as_view(template_name='index.html')),
+    path('api/', include(api_patterns)),
 ]
