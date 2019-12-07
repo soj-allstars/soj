@@ -18,7 +18,7 @@ def get_user_submission(request):
         return Response({'info': 'invalid submission id'}, status.HTTP_400_BAD_REQUEST)
 
     return Response({
-        'verdict': VerdictResult(submission.verdict).name,
+        'verdict': VerdictResult(submission.verdict).name if submission.verdict is not None else 'PENDING',
         'memory_usage': submission.memory,
         'time_usage': submission.time,
         'submit_time': submission.submit_time,
