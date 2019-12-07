@@ -47,7 +47,7 @@ def do_submission(request):
         submission.save()
     except Exception as exception:
         logging.error(f'[do_submission] {exception=}')
-        return Response({'info': 'something went wrong, please contact yjp.'},
+        return Response({'info': 'something went wrong, please roast yjp.'},
                         status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    return Response()
+    return Response({'submission_id': submission.id})

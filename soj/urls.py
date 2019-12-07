@@ -19,6 +19,7 @@ from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
 import problemset.urls
 import judge.urls
+import user.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,4 +34,5 @@ urlpatterns = [
     ), name='openapi-schema'),
     path('api/problem/', include(problemset.urls)),
     path('api/judge/', include(judge.urls)),
+    path('api/submission/', include(user.urls)),
 ]
