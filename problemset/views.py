@@ -2,55 +2,61 @@ from common.consts import LanguageEnum, VerdictResult
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.generics import (
+    RetrieveDestroyAPIView,
+    RetrieveAPIView,
+    ListAPIView,
+)
+from rest_framework.serializers import (
+    ModelSerializer,
+    SerializerMethodField,
+    StringRelatedField,
+    CharField,
+)
 from problemset.models import Problem
 from user.models import Submission
 import logging
 
 
-class ProblemView(APIView):
-    def get(self, request):
-        problem_id = request.GET['pid']
+class ProblemDetail(RetrieveDestroyAPIView):
+    class ProblemDetailSerializer(ModelSerializer):
+        class Meta:
+            model = Problem
+            fields = ('title', 'time_limit', 'memory_limit', 'description',
+                      'sample_inputs', 'sample_outputs', 'note')
 
-        problem = Problem.objects.get(id=problem_id)
-
-        return Response({
-            'title': problem.title,
-            'time_limit': problem.time_limit,
-            'memory_limit': problem.memory_limit,
-            'description': problem.description,
-            'sample_inputs': problem.sample_inputs,
-            'sample_outputs': problem.sample_outputs,
-            'note': problem.note,
-        })
-
-    def post(self, request):
-        raise NotImplementedError
-
-    def delete(self, request):
-        problem_id = request.GET['pid']
-
-        problem = Problem.objects.get(id=problem_id)
-
-        problem.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    queryset = Problem.objects.all()
+    serializer_class = ProblemDetailSerializer
 
 
-class SubmissionView(APIView):
-    def get(self, request):
-        sid = request.GET['sid']
+class ProblemList(ListAPIView):
+    class ProblemListSerializer(ModelSerializer):
+        class Meta:
+            model = Problem
+            fields = ('id', 'title')
 
-        submission = Submission.objects.get(id=sid)
+    queryset = Problem.objects.all()
+    serializer_class = ProblemListSerializer
 
-        return Response({
-            'verdict': VerdictResult(submission.verdict).name if submission.verdict is not None else 'PENDING',
-            'memory_usage': submission.memory,
-            'time_usage': submission.time,
-            'submit_time': submission.submit_time,
-            'code': submission.code,
-            'lang': LanguageEnum(submission.lang).name,
-            'outputs': submission.outputs,
-        })
 
+class SubmissionDetail(RetrieveAPIView):
+    class SubmissionDetailSerializer(ModelSerializer):
+        verdict = SerializerMethodField()
+        lang = CharField(source='get_lang_display')
+
+        class Meta:
+            model = Submission
+            fields = ('verdict', 'memory', 'time', 'submit_time',
+                      'code', 'lang', 'outputs')
+
+        def get_verdict(self, obj):
+            return VerdictResult(obj.verdict).name if obj.verdict is not None else 'PENDING'
+
+    queryset = Submission.objects.all()
+    serializer_class = SubmissionDetailSerializer
+
+
+class SubmissionPost(APIView):
     def post(self, request):
         problem_id = request.POST['pid']
         code = request.POST['code']
@@ -64,8 +70,24 @@ class SubmissionView(APIView):
             submission.lang = getattr(LanguageEnum, lang).value
             submission.save()
         except Exception as exception:
-            logging.error(f'[do_submission] {exception=}')
-            return Response({'info': 'something went wrong, please roast yjp.'},
+            logging.error(f'[SubmissionPost] {exception=}')
+            return Response({'detail': 'something went wrong, please roast yjp.'},
                             status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({'submission_id': submission.id})
+
+
+class SubmissionList(ListAPIView):
+    class SubmissionListSerializer(ModelSerializer):
+        verdict = SerializerMethodField()
+        user = StringRelatedField()
+
+        class Meta:
+            model = Submission
+            fields = ('id', 'problem_id', 'user', 'verdict', 'submit_time', 'time', 'memory')
+
+        def get_verdict(self, obj):
+            return VerdictResult(obj.verdict).name if obj.verdict is not None else 'PENDING'
+
+    queryset = Submission.objects.all()
+    serializer_class = SubmissionListSerializer

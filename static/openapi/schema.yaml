@@ -1,0 +1,174 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api/problem/{id}/:
+    get:
+      operationId: RetrieveProblem
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Id of the problem.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  title:
+                    type: string
+                    maxLength: 50
+                  time_limit:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In ms
+                  memory_limit:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In KB
+                  description:
+                    type: string
+                  sample_inputs:
+                    type: array
+                    items:
+                      type: string
+                    description: one item one test case
+                  sample_outputs:
+                    type: array
+                    items:
+                      type: string
+                    description: one item one test case
+                  note:
+                    type: string
+          description: ''
+    delete:
+      operationId: DestroyProblem
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this problem.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'successfully deleted'
+  /api/problems/:
+    get:
+      operationId: listProblems
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    title:
+                      type: string
+                      maxLength: 50
+                  required:
+                  - title
+          description: ''
+  /api/submission/{id}/:
+    get:
+      operationId: RetrieveSubmission
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this submission.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  verdict:
+                    type: string
+                    readOnly: true
+                  memory:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In KB
+                  time:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In ms
+                  submit_time:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  code:
+                    type: string
+                  lang:
+                    type: string
+                  outputs:
+                    type: array
+                    description: one item one test case
+                    items:
+                      type: string
+          description: ''
+  /api/submissions/:
+    get:
+      operationId: listSubmissions
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                    id:
+                      type: integer
+                      readOnly: true
+                    problem_id:
+                      type: string
+                      readOnly: true
+                    user:
+                      type: string
+                      readOnly: true
+                    verdict:
+                      type: string
+                      readOnly: true
+                    submit_time:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                    time:
+                      type: integer
+                      maximum: 2147483647
+                      minimum: -2147483648
+                      description: In ms
+                    memory:
+                      type: integer
+                      maximum: 2147483647
+                      minimum: -2147483648
+                      description: In KB
+          description: ''
+  /api/judge/result/:
+    post:
+      operationId: Createjudge_finished
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''

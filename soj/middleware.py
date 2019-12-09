@@ -23,9 +23,9 @@ class SojMiddleware:
     def process_exception(self, request, exception):
         # caution: this may lead to a bug that is hard to locate
         if isinstance(exception, MultiValueDictKeyError):
-            return JsonResponse({'info': f'hi, you missed {exception} parameter.'},
+            return JsonResponse({'detail': f'hi, you missed {exception} parameter.'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
         if isinstance(exception, ObjectDoesNotExist):
-            return JsonResponse({'info': f'hi, corresponding {exception} please ensure the *id you passed is correct.'},
+            return JsonResponse({'detail': f'hi, corresponding {exception} please ensure the *id you passed is correct.'},
                                 status=status.HTTP_404_NOT_FOUND)
