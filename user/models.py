@@ -24,3 +24,6 @@ class Submission(Model):
     desc = models.CharField(max_length=255, blank=True)
     outputs = JSONField(default=list)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.problem.title}'

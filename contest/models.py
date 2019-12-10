@@ -11,3 +11,6 @@ class Contest(Model):
     users = models.ManyToManyField(get_user_model())
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+
+    def __str__(self):
+        return self.name

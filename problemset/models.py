@@ -16,6 +16,9 @@ class Problem(Model):
     sample_outputs = JSONField(default=list)
     checker_type = models.SmallIntegerField(choices=CHECKER_TYPE_CHOICES)
 
+    def __str__(self):
+        return self.title
+
 
 class TestCase(Model):
     problem = models.OneToOneField(Problem, models.CASCADE)
