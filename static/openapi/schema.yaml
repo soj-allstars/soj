@@ -1,6 +1,6 @@
 openapi: 3.0.2
 info:
-  title: ''
+  title: 'soj'
   version: ''
 paths:
   /api/problem/{id}/:
@@ -161,6 +161,36 @@ paths:
                       maximum: 2147483647
                       minimum: -2147483648
                       description: In KB
+          description: ''
+  /api/submission/:
+    post:
+      operationId: CreateSubmissionPost
+      parameters: []
+      requestBody:
+        description: parameters needed
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                pid:
+                  type: string
+                  description: the id of the problem
+                code:
+                  type: string
+                  description: code
+                lang:
+                  type: string
+                  description: language, one of attribute names of LanguageEnum
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  submission_id:
+                    type: integer
+                    description: the id of this submission
           description: ''
   /api/judge/result/:
     post:

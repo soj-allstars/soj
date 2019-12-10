@@ -15,6 +15,7 @@ from rest_framework.serializers import (
 )
 from problemset.models import Problem
 from user.models import Submission
+from judge.tasks import send_judge_request
 import logging
 
 
@@ -62,6 +63,8 @@ class SubmissionPost(APIView):
         code = request.POST['code']
         lang = request.POST['lang']
 
+        problem = Problem.objects.get(id=problem_id)
+
         try:
             submission = Submission()
             submission.user = request.user
@@ -69,6 +72,8 @@ class SubmissionPost(APIView):
             submission.code = code
             submission.lang = getattr(LanguageEnum, lang).value
             submission.save()
+
+            send_judge_request(problem, submission)
         except Exception as exception:
             logging.error(f'[SubmissionPost] {exception=}')
             return Response({'detail': 'something went wrong, please roast yjp.'},
