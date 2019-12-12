@@ -36,7 +36,7 @@ class ProblemList(ListAPIView):
             model = Problem
             fields = ('id', 'title')
 
-    queryset = Problem.objects.all()
+    queryset = Problem.objects.all().order_by('id')
     serializer_class = ProblemListSerializer
 
 
@@ -94,5 +94,5 @@ class SubmissionList(ListAPIView):
         def get_verdict(self, obj):
             return VerdictResult(obj.verdict).name if obj.verdict is not None else 'PENDING'
 
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.all().order_by('-id')
     serializer_class = SubmissionListSerializer

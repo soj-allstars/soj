@@ -5,6 +5,7 @@ info:
 paths:
   /api/problem/{id}/:
     get:
+      summary: get problem detail by id
       operationId: RetrieveProblem
       parameters:
       - name: id
@@ -48,6 +49,7 @@ paths:
                     type: string
           description: ''
     delete:
+      summary: delete problem by id
       operationId: DestroyProblem
       parameters:
       - name: id
@@ -61,27 +63,47 @@ paths:
           description: 'successfully deleted'
   /api/problems/:
     get:
+      summary: get problem list
       operationId: listProblems
-      parameters: []
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  properties:
-                    id:
-                      type: integer
-                      readOnly: true
-                    title:
-                      type: string
-                      maxLength: 50
-                  required:
-                  - title
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                  previous:
+                    type: string
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        title:
+                          type: string
+                          maxLength: 50
+                      required:
+                        - title
           description: ''
   /api/submission/{id}/:
     get:
+      summary: get submission detail by id
       operationId: RetrieveSubmission
       parameters:
       - name: id
@@ -125,45 +147,65 @@ paths:
           description: ''
   /api/submissions/:
     get:
+      summary: get submission list
       operationId: listSubmissions
-      parameters: []
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  properties:
-                    id:
-                      type: integer
-                      readOnly: true
-                    problem_id:
-                      type: string
-                      readOnly: true
-                    user:
-                      type: string
-                      readOnly: true
-                    verdict:
-                      type: string
-                      readOnly: true
-                    submit_time:
-                      type: string
-                      format: date-time
-                      readOnly: true
-                    time:
-                      type: integer
-                      maximum: 2147483647
-                      minimum: -2147483648
-                      description: In ms
-                    memory:
-                      type: integer
-                      maximum: 2147483647
-                      minimum: -2147483648
-                      description: In KB
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                  previous:
+                    type: string
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        problem_id:
+                          type: string
+                          readOnly: true
+                        user:
+                          type: string
+                          readOnly: true
+                        verdict:
+                          type: string
+                          readOnly: true
+                        submit_time:
+                          type: string
+                          format: date-time
+                          readOnly: true
+                        time:
+                          type: integer
+                          maximum: 2147483647
+                          minimum: -2147483648
+                          description: In ms
+                        memory:
+                          type: integer
+                          maximum: 2147483647
+                          minimum: -2147483648
+                          description: In KB
           description: ''
   /api/submission/:
     post:
+      summary: do a submission
       operationId: CreateSubmissionPost
       parameters: []
       requestBody:
@@ -194,6 +236,7 @@ paths:
           description: ''
   /api/judge/result/:
     post:
+      summary: used for judger
       operationId: Createjudge_finished
       parameters: []
       responses:
