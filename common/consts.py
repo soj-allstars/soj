@@ -30,13 +30,14 @@ class CheckerType(IntEnum):
 @unique
 class VerdictResult(IntEnum):
     AC = 0  # Accepted
-    WA = 1  # Wrong Answer
-    TLE = 1 << 1  # Time Limit Exceeded
-    RE = 1 << 2  # Runtime Error
-    MLE = 1 << 3  # Memory Limit Exceeded
-    OLE = 1 << 4  # Output Limit Exceeded
-    CE = 1 << 5  # Compile Error
-    IE = 1 << 30  # Internal Error
+    PE = 1  # Presentation Error
+    TLE = 2  # Time Limit Exceeded
+    MLE = 3  # Memory Limit Exceeded
+    WA = 4  # Wrong Answer
+    RE = 5  # Runtime Error
+    OLE = 6  # Output Limit Exceeded
+    CE = 7  # Compile Error
+    SE = 8  # System Error
 
 
 @unique
