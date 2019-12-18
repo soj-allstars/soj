@@ -20,10 +20,10 @@ class Submission(Model):
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     time = models.IntegerField(help_text='In ms', default=0)
     memory = models.IntegerField(help_text='In KB', default=0)
-    verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, null=True)
+    verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, null=True, blank=True)
     desc = models.CharField(max_length=255, blank=True)
-    outputs = JSONField(default=list)
-    job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True)
+    outputs = JSONField(default=list, blank=True)
+    job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username}: {self.problem.title}'
