@@ -63,7 +63,7 @@ paths:
           description: 'successfully deleted'
   /api/problems/:
     get:
-      summary: get problem list
+      summary: get problem list, the page size is currently 50
       operationId: listProblems
       parameters:
         - name: page
@@ -147,7 +147,7 @@ paths:
           description: ''
   /api/submissions/:
     get:
-      summary: get submission list
+      summary: get submission list, the page size is currently 50
       operationId: listSubmissions
       parameters:
         - name: page
@@ -205,7 +205,7 @@ paths:
           description: ''
   /api/submission/:
     post:
-      summary: do a submission
+      summary: submit code for a problem
       operationId: CreateSubmissionPost
       parameters: []
       requestBody:
@@ -216,7 +216,7 @@ paths:
             schema:
               properties:
                 pid:
-                  type: string
+                  type: integer
                   description: the id of the problem
                 code:
                   type: string
