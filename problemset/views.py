@@ -51,7 +51,7 @@ class SubmissionDetail(RetrieveAPIView):
                       'code', 'lang', 'outputs')
 
         def get_verdict(self, obj):
-            return VerdictResult(obj.verdict).name if obj.verdict is not None else 'PENDING'
+            return VerdictResult(obj.verdict).name
 
     queryset = Submission.objects.all()
     serializer_class = SubmissionDetailSerializer
@@ -92,7 +92,7 @@ class SubmissionList(ListAPIView):
             fields = ('id', 'problem_id', 'user', 'verdict', 'submit_time', 'time', 'memory')
 
         def get_verdict(self, obj):
-            return VerdictResult(obj.verdict).name if obj.verdict is not None else 'PENDING'
+            return VerdictResult(obj.verdict).name
 
     queryset = Submission.objects.all().order_by('-id')
     serializer_class = SubmissionListSerializer

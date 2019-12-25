@@ -29,6 +29,7 @@ class CheckerType(IntEnum):
 
 @unique
 class VerdictResult(IntEnum):
+    PENDING = -1  # Pending
     AC = 0  # Accepted
     PE = 1  # Presentation Error
     TLE = 2  # Time Limit Exceeded
@@ -42,10 +43,9 @@ class VerdictResult(IntEnum):
 
 @unique
 class LanguageEnum(IntEnum):
-    CPP = 1
-    C = 2
+    GXX = 1
+    GCC = 2
     Java = 3
-    Python2 = 4
-    Python3 = 5
-    Go = 6
-    JavaScript = 7
+    CPY = 4
+    Go = 5
+    JavaScript = 6

@@ -17,7 +17,7 @@ def judge_finished(request):
         return HttpResponseBadRequest()
 
     submission.verdict = result['verdict']
-    submission.desc = result.get('desc', '')
+    submission.desc = str(result.get('desc', ''))
     submission.time = result['time_usage']
     submission.memory = result['memory_usage']
     submission.outputs = result['outputs']
