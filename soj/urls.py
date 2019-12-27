@@ -18,9 +18,10 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from problemset.urls import urlpatterns as problemset_apis
 from judge.urls import urlpatterns as judge_apis
+from user.urls import urlpatterns as user_apis
 
 
-api_patterns = problemset_apis + judge_apis
+api_patterns = problemset_apis + judge_apis + user_apis
 
 urlpatterns = [
     path('admin/', admin.site.urls),

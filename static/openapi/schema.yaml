@@ -212,7 +212,7 @@ paths:
         description: parameters needed
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               properties:
                 pid:
@@ -238,6 +238,48 @@ paths:
     post:
       summary: used for judger
       operationId: Createjudge_finished
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+  /api/user/login/:
+    post:
+      operationId: user_login
+      parameters: []
+      requestBody:
+        description: parameters needed
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                keep:
+                  type: boolean
+                  description: true if keep the login status
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+          description: 'wrong username or password'
+  /api/user/logout/:
+    post:
+      operationId: user_logout
       parameters: []
       responses:
         '200':
