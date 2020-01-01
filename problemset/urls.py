@@ -1,5 +1,12 @@
 from django.urls import path
-from problemset.views import ProblemDetail, SubmissionDetail, ProblemList, SubmissionList, SubmissionPost
+from problemset.views import (
+    ProblemDetail,
+    SubmissionDetail,
+    ProblemList,
+    SubmissionList,
+    SubmissionPost,
+    ProblemPost
+)
 
 urlpatterns = [
     path('problem/<int:pk>/', ProblemDetail.as_view()),
@@ -7,4 +14,5 @@ urlpatterns = [
     path('submission/<int:pk>/', SubmissionDetail.as_view()),
     path('submission/', SubmissionPost.as_view()),
     path('submissions/', SubmissionList.as_view()),
+    path('problem/', ProblemPost.as_view()),
 ]

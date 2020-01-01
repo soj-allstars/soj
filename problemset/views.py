@@ -1,4 +1,4 @@
-from common.consts import LanguageEnum, VerdictResult
+from common.consts import LanguageEnum, VerdictResult, CheckerType
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -6,14 +6,16 @@ from rest_framework.generics import (
     RetrieveDestroyAPIView,
     RetrieveAPIView,
     ListAPIView,
+    CreateAPIView,
 )
 from rest_framework.serializers import (
     ModelSerializer,
     SerializerMethodField,
     StringRelatedField,
     CharField,
+    JSONField,
 )
-from problemset.models import Problem
+from problemset.models import Problem, Solution, TestCase
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
@@ -38,6 +40,44 @@ class ProblemList(ListAPIView):
 
     queryset = Problem.objects.all().order_by('id')
     serializer_class = ProblemListSerializer
+
+
+class ProblemPost(CreateAPIView):
+    class ProblemPostSerializer(ModelSerializer):
+        inputs = JSONField()
+        solution_code = CharField()
+        solution_lang = CharField()
+        checker_type = CharField()
+
+        class Meta:
+            model = Problem
+            fields = ('title', 'description', 'time_limit', 'memory_limit', 'note',
+                      'sample_inputs', 'checker_type', 'inputs',
+                      'solution_code', 'solution_lang')  # TODO add checker_code
+
+        def create(self, validated_data):
+            validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
+            inputs = validated_data.pop('inputs')
+            solution_code = validated_data.pop('solution_code')
+            solution_lang = validated_data.pop('solution_lang')
+
+            problem = Problem(**validated_data)
+            problem.save()
+            test_case = TestCase(problem=problem, inputs=inputs, expected_outputs="")
+            solution = Solution(problem=problem, code=solution_code,
+                                lang=getattr(LanguageEnum, solution_lang).value, is_model_solution=True)
+            test_case.save()
+            solution.save()
+
+            return problem
+
+    serializer_class = ProblemPostSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        problem = serializer.save()
+        return Response({'problem_id': problem.id})
 
 
 class SubmissionDetail(RetrieveAPIView):
