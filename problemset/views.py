@@ -19,6 +19,7 @@ from problemset.models import Problem, Solution, TestCase
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
+from common.utils import soj_login_required
 
 
 class ProblemDetail(RetrieveDestroyAPIView):
@@ -30,6 +31,10 @@ class ProblemDetail(RetrieveDestroyAPIView):
 
     queryset = Problem.objects.all()
     serializer_class = ProblemDetailSerializer
+
+    @soj_login_required
+    def delete(self, request, *args, **kwargs):
+        super().delete(request, *args, **kwargs)
 
 
 class ProblemList(ListAPIView):
@@ -79,6 +84,10 @@ class ProblemPost(CreateAPIView):
         problem = serializer.save()
         return Response({'problem_id': problem.id})
 
+    @soj_login_required
+    def post(self, request, *args, **kwargs):
+        super().post(request, *args, **kwargs)
+
 
 class SubmissionDetail(RetrieveAPIView):
     class SubmissionDetailSerializer(ModelSerializer):
@@ -98,6 +107,7 @@ class SubmissionDetail(RetrieveAPIView):
 
 
 class SubmissionPost(APIView):
+    @soj_login_required
     def post(self, request):
         problem_id = request.POST['pid']
         code = request.POST['code']
