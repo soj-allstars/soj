@@ -29,7 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']  # need to change in product
 
 REDIS = Redis(
-    os.environ.get('REDIS_HOST', '47.106.140.231'),
+    os.environ.get('REDIS_HOST', '127.0.0.1'),
     os.environ.get('REDIS_PORT', 6379),
     password=os.environ.get('REDIS_PASSWORD', None)
 )
@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': 'soj',
         'USER': 'soj',
         'PASSWORD': 'soj',
-        'HOST': '47.106.140.231',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
