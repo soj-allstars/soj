@@ -16,6 +16,7 @@ class Problem(Model):
     sample_outputs = JSONField(default=list)
     checker_type = models.SmallIntegerField(choices=CHECKER_TYPE_CHOICES)
     checker_code = models.TextField(blank=True)
+    visible = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

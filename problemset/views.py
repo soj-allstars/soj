@@ -15,11 +15,21 @@ from rest_framework.serializers import (
     CharField,
     JSONField,
 )
+from rest_framework.decorators import api_view
 from problemset.models import Problem, Solution, TestCase
+from problemset.tasks import send_check_request
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
-from common.utils import soj_login_required
+from common.utils import soj_login_required, create_file_to_write
+from django.db import transaction
+from django.conf import settings
+
+
+def save_input_files(problem_id, inputs):
+    for i, test_case in enumerate(inputs):
+        with create_file_to_write(f'{settings.PROBLEM_DATA_DIR}/{problem_id}/{i + 1}_in') as f:
+            f.write(test_case)
 
 
 class ProblemDetail(RetrieveDestroyAPIView):
@@ -29,7 +39,7 @@ class ProblemDetail(RetrieveDestroyAPIView):
             fields = ('title', 'time_limit', 'memory_limit', 'description',
                       'sample_inputs', 'sample_outputs', 'note')
 
-    queryset = Problem.objects.all()
+    queryset = Problem.objects.filter(visible=True)
     serializer_class = ProblemDetailSerializer
 
     @soj_login_required
@@ -43,22 +53,24 @@ class ProblemList(ListAPIView):
             model = Problem
             fields = ('id', 'title')
 
-    queryset = Problem.objects.all().order_by('id')
+    queryset = Problem.objects.filter(visible=True).order_by('id')
     serializer_class = ProblemListSerializer
 
 
 class ProblemPost(CreateAPIView):
     class ProblemPostSerializer(ModelSerializer):
         inputs = JSONField()
+        sample_inputs = JSONField()
         solution_code = CharField()
         solution_lang = CharField()
         checker_type = CharField()
+        checker_code = CharField(allow_blank=True)
 
         class Meta:
             model = Problem
             fields = ('title', 'description', 'time_limit', 'memory_limit', 'note',
-                      'sample_inputs', 'checker_type', 'inputs',
-                      'solution_code', 'solution_lang')  # TODO add checker_code
+                      'sample_inputs', 'checker_type', 'inputs', 'checker_code',
+                      'solution_code', 'solution_lang')
 
         def create(self, validated_data):
             validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
@@ -74,6 +86,8 @@ class ProblemPost(CreateAPIView):
             test_case.save()
             solution.save()
 
+            save_input_files(problem.id, inputs)
+
             return problem
 
     serializer_class = ProblemPostSerializer
@@ -82,11 +96,40 @@ class ProblemPost(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         problem = serializer.save()
-        return Response({'problem_id': problem.id})
+
+        solution_code = request.POST['solution_code']
+        solution_lang = request.POST['solution_lang']
+
+        detail = {
+            'solution_code': solution_code,
+            'solution_lang': solution_lang,
+            'problem_id': problem.id,
+            'time_limit': problem.time_limit,
+            'memory_limit': problem.memory_limit,
+        }
+
+        if problem.checker_type == CheckerType.special_judge:
+            detail['sj_code'] = problem.checker_code
+            detail['sj_name'] = f'sj_{problem.id}'
+
+        job_id = send_check_request(detail)
+
+        return Response({'problem_id': problem.id, 'job_id': job_id})
 
     @soj_login_required
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         super().post(request, *args, **kwargs)
+
+
+@soj_login_required
+@api_view(['POST'])
+def make_problem_visible(request, pid):
+    problem = Problem.objects.get(id=pid)
+    problem.visible = True
+    problem.save()
+
+    return Response()
 
 
 class SubmissionDetail(RetrieveAPIView):
@@ -108,6 +151,7 @@ class SubmissionDetail(RetrieveAPIView):
 
 class SubmissionPost(APIView):
     @soj_login_required
+    @transaction.atomic
     def post(self, request):
         problem_id = request.POST['pid']
         code = request.POST['code']

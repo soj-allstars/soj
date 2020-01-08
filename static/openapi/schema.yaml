@@ -101,60 +101,81 @@ paths:
                       required:
                         - title
           description: ''
-  /api/problem/:
-  post:
-    summary: create a new problem
-    operationId: CreateProblemPost
-    parameters: []
-    requestBody:
-      content:
-        application/x-www-form-urlencoded:
-          schema:
-            properties:
-              title:
-                type: string
-                maxLength: 50
-              description:
-                type: string
-              time_limit:
-                type: integer
-                maximum: 2147483647
-                minimum: -2147483648
-                description: In ms
-              memory_limit:
-                type: integer
-                maximum: 2147483647
-                minimum: -2147483648
-                description: In KB
-              note:
-                type: string
-              sample_inputs:
-                type: string
-              checker_type:
-                type: string
-              inputs:
-                type: object
-              solution_code:
-                type: string
-              solution_lang:
-                type: string
-            required:
-              - title
-              - description
-              - checker_type
-              - inputs
-              - solution_code
-              - solution_lang
-    responses:
-      '200':
+  /api/problem/save/:
+    post:
+      summary: create a new problem
+      operationId: CreateProblemPost
+      parameters: []
+      requestBody:
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               properties:
-                problem_id:
+                title:
+                  type: string
+                  maxLength: 50
+                description:
+                  type: string
+                time_limit:
                   type: integer
-                  description: the id of new problem
-        description: ''
+                  maximum: 2147483647
+                  minimum: -2147483648
+                  description: In ms
+                memory_limit:
+                  type: integer
+                  maximum: 2147483647
+                  minimum: -2147483648
+                  description: In KB
+                note:
+                  type: string
+                sample_inputs:
+                  type: array
+                  description: one item one test case
+                  items:
+                    type: string
+                checker_type:
+                  type: string
+                checker_code:
+                  type: string
+                inputs:
+                  type: array
+                  description: one item one test case
+                  items:
+                    type: string
+                solution_code:
+                  type: string
+                solution_lang:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  problem_id:
+                    type: integer
+                    description: the id of new problem
+                  job_id:
+                    type: string
+                    description: the id of job that used for polling
+          description: ''
+  /api/problem/publish/{id}/:
+    post:
+      summary: make a problem visible
+      operationId: MakeProblemVisible
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: A id of this problem.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
   /api/submission/{id}/:
     get:
       summary: get submission detail by id

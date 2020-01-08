@@ -35,6 +35,8 @@ REDIS = Redis(
 )
 JUDGE_Q = Queue(connection=REDIS)
 
+PROBLEM_DATA_DIR = 'shared_data/problems'
+
 # Application definition
 
 INSTALLED_APPS = [

@@ -5,7 +5,8 @@ from problemset.views import (
     ProblemList,
     SubmissionList,
     SubmissionPost,
-    ProblemPost
+    ProblemPost,
+    make_problem_visible,
 )
 
 urlpatterns = [
@@ -14,5 +15,6 @@ urlpatterns = [
     path('submission/<int:pk>/', SubmissionDetail.as_view()),
     path('submission/', SubmissionPost.as_view()),
     path('submissions/', SubmissionList.as_view()),
-    path('problem/', ProblemPost.as_view()),
+    path('problem/save/', ProblemPost.as_view()),
+    path('problem/publish/<int:pid>/', make_problem_visible),
 ]

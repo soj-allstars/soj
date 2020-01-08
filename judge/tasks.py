@@ -1,7 +1,6 @@
 from django.conf import settings
 from problemset.models import Solution
 from common.consts import LanguageEnum, CheckerType
-import logging
 
 
 def send_judge_request(problem, submission):
