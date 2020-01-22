@@ -17,9 +17,8 @@ from rest_framework.serializers import (
 )
 from rest_framework.decorators import api_view
 from problemset.models import Problem, Solution, TestCase
-from problemset.tasks import send_check_request
 from user.models import Submission
-from judge.tasks import send_judge_request
+from judge.tasks import send_judge_request, send_check_request
 import logging
 from common.utils import soj_login_required, create_file_to_write
 from django.db import transaction
@@ -112,9 +111,7 @@ class ProblemPost(CreateAPIView):
             detail['sj_code'] = problem.checker_code
             detail['sj_name'] = f'sj_{problem.id}'
 
-        job_id = send_check_request(detail)
-
-        return Response({'problem_id': problem.id, 'job_id': job_id})
+        return Response({'problem_id': problem.id})
 
     @soj_login_required
     @transaction.atomic

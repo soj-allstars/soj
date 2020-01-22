@@ -20,3 +20,10 @@ def send_judge_request(problem, submission):
     )
     submission.job_id = judge_job.id
     submission.save()
+
+
+def send_check_request(detail):
+    check_job = settings.CHECK_Q.enqueue(
+        'judge_jobs.check_solution_and_checker', **detail
+    )
+    return check_job.id

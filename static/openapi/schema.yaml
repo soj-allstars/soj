@@ -155,9 +155,6 @@ paths:
                   problem_id:
                     type: integer
                     description: the id of new problem
-                  job_id:
-                    type: string
-                    description: the id of job that used for polling
           description: ''
   /api/problem/publish/{id}/:
     post:

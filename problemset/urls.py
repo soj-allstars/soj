@@ -8,6 +8,7 @@ from problemset.views import (
     ProblemPost,
     make_problem_visible,
 )
+from problemset.consumers import CheckSolution
 
 urlpatterns = [
     path('problem/<int:pk>/', ProblemDetail.as_view()),
@@ -17,4 +18,8 @@ urlpatterns = [
     path('submissions/', SubmissionList.as_view()),
     path('problem/save/', ProblemPost.as_view()),
     path('problem/publish/<int:pid>/', make_problem_visible),
+]
+
+websocket_urlpatterns = [
+    path('ws/problem/check/', CheckSolution),
 ]

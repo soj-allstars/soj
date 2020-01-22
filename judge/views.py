@@ -24,3 +24,12 @@ def judge_finished(request):
     submission.save()
 
     return HttpResponse()
+
+
+@api_view(['POST'])
+def check_finished(request):
+    problem_id = request.POST.get('problem_id')
+    result = json.loads(request.POST.get('result'))
+    # TODO WebSocket send
+
+    return HttpResponse()

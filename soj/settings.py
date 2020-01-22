@@ -34,6 +34,7 @@ REDIS = Redis(
     password=os.environ.get('REDIS_PASSWORD', None)
 )
 JUDGE_Q = Queue(connection=REDIS)
+CHECK_Q = Queue('check', connection=REDIS)
 
 PROBLEM_DATA_DIR = 'shared_data/problems'
 
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'corsheaders',
     'rest_framework',
     'problemset',
@@ -92,6 +94,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'soj.wsgi.application'
+ASGI_APPLICATION = 'soj.routing.application'
 
 
 # Database
