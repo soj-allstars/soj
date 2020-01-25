@@ -18,7 +18,7 @@ from rest_framework.serializers import (
 from rest_framework.decorators import api_view
 from problemset.models import Problem, Solution, TestCase
 from user.models import Submission
-from judge.tasks import send_judge_request, send_check_request
+from judge.tasks import send_judge_request
 import logging
 from common.utils import soj_login_required, create_file_to_write
 from django.db import transaction
@@ -73,6 +73,8 @@ class ProblemPost(CreateAPIView):
 
         def create(self, validated_data):
             validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
+            if not validated_data['sample_inputs']:
+                validated_data['sample_inputs'] = validated_data['inputs'][:2]
             inputs = validated_data.pop('inputs')
             solution_code = validated_data.pop('solution_code')
             solution_lang = validated_data.pop('solution_lang')
@@ -95,21 +97,6 @@ class ProblemPost(CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         problem = serializer.save()
-
-        solution_code = request.POST['solution_code']
-        solution_lang = request.POST['solution_lang']
-
-        detail = {
-            'solution_code': solution_code,
-            'solution_lang': solution_lang,
-            'problem_id': problem.id,
-            'time_limit': problem.time_limit,
-            'memory_limit': problem.memory_limit,
-        }
-
-        if problem.checker_type == CheckerType.special_judge:
-            detail['sj_code'] = problem.checker_code
-            detail['sj_name'] = f'sj_{problem.id}'
 
         return Response({'problem_id': problem.id})
 
