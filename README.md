@@ -1,7 +1,7 @@
 # soj - STU(Shit) Open Judge
 
 ## How to Setup
-soj need python3.8 to run.
+soj need Python 3.8 to run.
 
 run following commands to setup.
 ```bash
@@ -22,3 +22,7 @@ finally
 ```bash
 python manage.py migrate
 ```
+### development
+Twisted is not supported on 3.8 on Windows, so if develop on Windows, find the solution below
+
+[Solution](https://stackoverflow.com/questions/58908293/i-keep-getting-notimplementederror-error-when-starting-django-server)
