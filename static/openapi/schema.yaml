@@ -48,9 +48,10 @@ paths:
                   note:
                     type: string
           description: ''
-    delete:
-      summary: delete problem by id
-      operationId: DestroyProblem
+  /api/problem/admin/{id}/:
+    get:
+      summary: get problem *full* detail by id
+      operationId: RetrieveProblem
       parameters:
       - name: id
         in: path
@@ -59,8 +60,63 @@ paths:
         schema:
           type: string
       responses:
-        '204':
-          description: 'successfully deleted'
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  checker_type:
+                    type: string
+                  inputs:
+                    type: object
+                  solutions:
+                    type: array
+                    items:
+                      properties:
+                        code:
+                          type: string
+                        lang:
+                          type: string
+                        is_model_solution:
+                          type: boolean
+                      required:
+                      - code
+                      - lang
+                    readOnly: true
+                  title:
+                    type: string
+                    maxLength: 50
+                  description:
+                    type: string
+                  time_limit:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In ms
+                  memory_limit:
+                    type: integer
+                    maximum: 2147483647
+                    minimum: -2147483648
+                    description: In KB
+                  note:
+                    type: string
+                  sample_inputs:
+                    type: string
+                  sample_outputs:
+                    type: string
+                  checker_code:
+                    type: string
+                  visible:
+                    type: boolean
+                required:
+                - checker_type
+                - inputs
+                - title
+                - description
+          description: ''
   /api/problems/:
     get:
       summary: get problem list, the page size is currently 50
@@ -254,6 +310,9 @@ paths:
                         problem_id:
                           type: string
                           readOnly: true
+                        user_id:
+                          type: string
+                          readOnly: true
                         user:
                           type: string
                           readOnly: true
@@ -341,17 +400,6 @@ paths:
   /api/user/logout/:
     post:
       operationId: user_logout
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema: {}
-          description: ''
-  /api/judge/result/:
-    post:
-      summary: used for judger
-      operationId: Createjudge_finished
       parameters: []
       responses:
         '200':

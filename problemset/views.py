@@ -3,14 +3,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.generics import (
-    RetrieveDestroyAPIView,
     RetrieveAPIView,
     ListAPIView,
     CreateAPIView,
 )
 from rest_framework.serializers import (
     ModelSerializer,
-    SerializerMethodField,
     StringRelatedField,
     CharField,
     JSONField,
@@ -20,7 +18,7 @@ from problemset.models import Problem, Solution, TestCase
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
-from common.utils import soj_login_required, create_file_to_write
+from common.utils import soj_login_required, create_file_to_write, soj_superuser_required
 from django.db import transaction
 from django.conf import settings
 
@@ -31,7 +29,7 @@ def save_input_files(problem_id, inputs):
             f.write(test_case)
 
 
-class ProblemDetail(RetrieveDestroyAPIView):
+class ProblemDetail(RetrieveAPIView):
     class ProblemDetailSerializer(ModelSerializer):
         class Meta:
             model = Problem
@@ -41,9 +39,30 @@ class ProblemDetail(RetrieveDestroyAPIView):
     queryset = Problem.objects.filter(visible=True)
     serializer_class = ProblemDetailSerializer
 
-    @soj_login_required
-    def delete(self, request, *args, **kwargs):
-        super().delete(request, *args, **kwargs)
+
+class ProblemAdminDetail(RetrieveAPIView):
+    class ProblemAdminSerializer(ModelSerializer):
+        class SolutionSerializer(ModelSerializer):
+            lang = CharField(source='get_lang_display')
+
+            class Meta:
+                model = Solution
+                fields = ('code', 'lang', 'is_model_solution')
+
+        checker_type = CharField(source='get_checker_type_display')
+        inputs = JSONField(source='testcase.inputs')
+        solutions = SolutionSerializer(many=True, read_only=True)
+
+        class Meta:
+            model = Problem
+            fields = '__all__'
+
+    queryset = Problem.objects.all()
+    serializer_class = ProblemAdminSerializer
+
+    @soj_superuser_required
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
 
 class ProblemList(ListAPIView):
@@ -71,7 +90,7 @@ class ProblemPost(CreateAPIView):
                       'sample_inputs', 'checker_type', 'inputs', 'checker_code',
                       'solution_code', 'solution_lang')
 
-        def create(self, validated_data):
+        def create(self, validated_data):  # TODO if sample_inputs get sample_outputs
             validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
             if not validated_data['sample_inputs']:
                 validated_data['sample_inputs'] = validated_data['inputs'][:2]
@@ -106,28 +125,32 @@ class ProblemPost(CreateAPIView):
         super().post(request, *args, **kwargs)
 
 
+class ProblemPut(APIView):
+    @soj_login_required
+    @transaction.atomic
+    def put(self, request, *args, **kwargs):
+        raise NotImplementedError
+
+
 @soj_login_required
 @api_view(['POST'])
 def make_problem_visible(request, pid):
     problem = Problem.objects.get(id=pid)
     problem.visible = True
-    problem.save()
+    problem.save(update_fields=['visible'])
 
     return Response()
 
 
 class SubmissionDetail(RetrieveAPIView):
     class SubmissionDetailSerializer(ModelSerializer):
-        verdict = SerializerMethodField()
+        verdict = CharField(source='get_verdict_display')
         lang = CharField(source='get_lang_display')
 
         class Meta:
             model = Submission
             fields = ('verdict', 'memory', 'time', 'submit_time',
                       'code', 'lang', 'outputs')
-
-        def get_verdict(self, obj):
-            return VerdictResult(obj.verdict).name
 
     queryset = Submission.objects.all()
     serializer_class = SubmissionDetailSerializer
@@ -162,15 +185,12 @@ class SubmissionPost(APIView):
 
 class SubmissionList(ListAPIView):
     class SubmissionListSerializer(ModelSerializer):
-        verdict = SerializerMethodField()
+        verdict = CharField(source='get_verdict_display')
         user = StringRelatedField()
 
         class Meta:
             model = Submission
-            fields = ('id', 'problem_id', 'user', 'verdict', 'submit_time', 'time', 'memory')
-
-        def get_verdict(self, obj):
-            return VerdictResult(obj.verdict).name
+            fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory')
 
     queryset = Submission.objects.all().order_by('-id')
     serializer_class = SubmissionListSerializer

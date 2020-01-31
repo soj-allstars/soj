@@ -7,11 +7,13 @@ from problemset.views import (
     SubmissionPost,
     ProblemPost,
     make_problem_visible,
+    ProblemAdminDetail,
 )
 from problemset.consumers import CheckSolution
 
 urlpatterns = [
     path('problem/<int:pk>/', ProblemDetail.as_view()),
+    path('problem/admin/<int:pk>/', ProblemAdminDetail.as_view()),
     path('problems/', ProblemList.as_view()),
     path('submission/<int:pk>/', SubmissionDetail.as_view()),
     path('submission/', SubmissionPost.as_view()),

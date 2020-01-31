@@ -47,5 +47,6 @@ class LanguageEnum(IntEnum):
     GCC = 2
     Java = 3
     CPY = 4
-    Go = 5
-    JavaScript = 6
+    PYPY = 5
+    Go = 6
+    JavaScript = 7

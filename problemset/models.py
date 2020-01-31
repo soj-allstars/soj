@@ -29,7 +29,7 @@ class TestCase(Model):
 
 
 class Solution(Model):
-    problem = models.ForeignKey(Problem, models.CASCADE)
+    problem = models.ForeignKey(Problem, models.CASCADE, related_name='solutions')
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     is_model_solution = models.BooleanField(default=False)
