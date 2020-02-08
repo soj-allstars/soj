@@ -15,6 +15,7 @@ from rest_framework.serializers import (
 )
 from rest_framework.decorators import api_view
 from problemset.models import Problem, Solution, TestCase
+from contest.models import Contest
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
@@ -163,6 +164,12 @@ class SubmissionPost(APIView):
         problem_id = request.POST['pid']
         code = request.POST['code']
         lang = request.POST['lang']
+        contest_id = request.POST.get('contest_id')
+        if contest_id:
+            contest = Contest.objects.get(id=contest_id)
+            if not contest.is_running:
+                return Response({'detail': "you can't submit to a contest that's not running"},
+                                status.HTTP_403_FORBIDDEN)
 
         problem = Problem.objects.get(id=problem_id)
 
@@ -172,6 +179,7 @@ class SubmissionPost(APIView):
             submission.problem_id = problem_id
             submission.code = code
             submission.lang = getattr(LanguageEnum, lang).value
+            submission.contest_id = contest_id
             submission.save()
 
             send_judge_request(problem, submission)

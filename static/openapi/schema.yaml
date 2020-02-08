@@ -348,13 +348,20 @@ paths:
               properties:
                 pid:
                   type: integer
-                  description: the id of the problem
+                  description: id of the problem
                 code:
                   type: string
                   description: code
                 lang:
                   type: string
                   description: language, one of attribute names of LanguageEnum
+                contest_id:
+                  type: integer
+                  description: id of the contest that is related to this submission, optional
+              required:
+                - pid
+                - code
+                - lang
       responses:
         '200':
           content:
@@ -364,6 +371,102 @@ paths:
                   submission_id:
                     type: integer
                     description: the id of this submission
+          description: ''
+  /api/contests/:
+    get:
+      summary: get contest list, the page size is currently 50
+      operationId: listContests
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                  previous:
+                    type: string
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        name:
+                          type: string
+                          maxLength: 255
+                        start_time:
+                          type: string
+                          format: date-time
+                        end_time:
+                          type: string
+                          format: date-time
+          description: ''
+  /api/contest/{id}/:
+    get:
+      summary: get contest detail by contest id
+      operationId: RetrieveContest
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this contest.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  id:
+                    type: integer
+                    readOnly: true
+                  name:
+                    type: string
+                    maxLength: 255
+                  description:
+                    type: string
+                  problems:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        title:
+                          type: string
+                          maxLength: 50
+                      required:
+                      - title
+                    readOnly: true
+                  start_time:
+                    type: string
+                    format: date-time
+                  end_time:
+                    type: string
+                    format: date-time
+                  is_running:
+                    type: boolean
+                    readOnly: true
+                  registered:
+                    type: boolean
+                    readOnly: true
+                    description: whether the user is registered to this contest
           description: ''
   /api/user/login/:
     post:

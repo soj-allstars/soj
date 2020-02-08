@@ -4,6 +4,7 @@ from django_mysql.models.fields import JSONField
 from django.contrib.auth import get_user_model
 from problemset.models import Problem
 from common.consts import VerdictResult, LanguageEnum
+from contest.models import Contest
 
 
 class UserInfo(Model):
@@ -24,6 +25,7 @@ class Submission(Model):
     desc = models.CharField(max_length=255, blank=True)
     outputs = JSONField(default=list, blank=True)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True, blank=True)
+    contest = models.ForeignKey(Contest, models.DO_NOTHING, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username}: {self.problem.title}'
