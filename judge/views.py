@@ -41,14 +41,14 @@ def check_finished(request):
 
     message = {}
     message['solution'] = {
-        'verdict': solution_res['verdict'],
+        'verdict': VerdictResult(solution_res['verdict']).name,
         'time_used': solution_res['time_usage'],
         'memory_used': solution_res['memory_usage'],
         'desc': str(solution_res.get('desc', ''))
     }
     if checker_res:
         message['checker'] = {
-            'verdict': checker_res['verdict'],
+            'verdict': VerdictResult(checker_res['verdict']).name,
             'time_used': checker_res['time_usage'],
             'memory_used': checker_res['memory_usage'],
             'desc': str(checker_res.get('desc', ''))
