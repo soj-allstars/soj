@@ -415,6 +415,13 @@ paths:
                         end_time:
                           type: string
                           format: date-time
+                        is_running:
+                          type: boolean
+                          readOnly: true
+                          description: whether the contest is running
+                        category:
+                          type: string
+                          description: one of ['OPEN', 'PRIVATE', 'REGISTER']
           description: ''
   /api/contest/{id}/:
     get:
@@ -463,10 +470,14 @@ paths:
                   is_running:
                     type: boolean
                     readOnly: true
+                    description: whether the contest is running
                   registered:
                     type: boolean
                     readOnly: true
                     description: whether the user is registered to this contest
+                  category:
+                    type: string
+                    description: one of ['OPEN', 'PRIVATE', 'REGISTER']
           description: ''
   /api/user/login/:
     post:

@@ -4,6 +4,7 @@ from rest_framework.generics import (
 )
 from rest_framework.serializers import (
     ModelSerializer,
+    CharField,
 )
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,9 +16,11 @@ from common.utils import soj_login_required
 
 class ContestList(ListAPIView):
     class ContestListSerializer(ModelSerializer):
+        category = CharField(source='get_category_display')
+
         class Meta:
             model = Contest
-            fields = ('id', 'name', 'start_time', 'end_time')
+            fields = ('id', 'name', 'start_time', 'end_time', 'is_running', 'category')
 
     queryset = Contest.objects.filter(visible=True).order_by('start_time')  # TODO need add index
     serializer_class = ContestListSerializer
@@ -26,10 +29,12 @@ class ContestList(ListAPIView):
 class ContestDetail(RetrieveAPIView):
     class ContestDetailSerializer(ModelSerializer):
         problems = ProblemList.ProblemListSerializer(many=True, read_only=True)
+        category = CharField(source='get_category_display')
 
         class Meta:
             model = Contest
-            fields = ('id', 'name', 'description', 'problems', 'start_time', 'end_time', 'is_running')
+            fields = ('id', 'name', 'description', 'problems',
+                      'start_time', 'end_time', 'is_running', 'category')
 
     queryset = Contest.objects.filter(visible=True)
     serializer_class = ContestDetailSerializer
@@ -50,5 +55,14 @@ class ContestDetail(RetrieveAPIView):
 def register_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
     contest.users.add(request.user)
+
+    return Response()
+
+
+@soj_login_required
+@api_view(['POST'])
+def unregister_contest(request, contest_id):
+    contest = Contest.objects.get(id=contest_id)
+    contest.users.remove(request.user)
 
     return Response()

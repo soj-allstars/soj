@@ -45,8 +45,18 @@ class VerdictResult(IntEnum):
 class LanguageEnum(IntEnum):
     GXX = 1
     GCC = 2
-    Java = 3
+    JAVA = 3
     CPY = 4
     PYPY = 5
-    Go = 6
-    JavaScript = 7
+    GO = 6
+    JS = 7
+
+
+@unique
+class ContestCategory(IntEnum):
+    OPEN = 0
+    PRIVATE = 1
+    REGISTER = 2
+
+
+PENALTY_FOR_ONE = 20 * 60

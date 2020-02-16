@@ -6,7 +6,8 @@ import logging
 import json
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from common.consts import VerdictResult
+from common.consts import VerdictResult, PENALTY_FOR_ONE
+from contest.models import Standing
 
 
 @api_view(['POST'])
@@ -26,6 +27,21 @@ def judge_finished(request):
     submission.memory = result['memory_usage']
     submission.outputs = result['outputs']
     submission.save()
+
+    related_contest = submission.contest
+    if related_contest:
+        if not related_contest.is_running:
+            return HttpResponse()
+
+        standing = Standing.objects.get(contest=related_contest, user=submission.user)
+        penalty = standing.penalties.get(submission.problem_id, 0)
+        if penalty <= 0:
+            if submission.verdict == VerdictResult.AC:
+                penalty = related_contest.get_elapsed_time_to(submission.submit_time) + (-penalty) * PENALTY_FOR_ONE
+            else:
+                penalty -= 1
+            standing.penalties[submission.problem_id] = penalty
+            standing.save(update_fields=['penalties'])
 
     return HttpResponse()
 

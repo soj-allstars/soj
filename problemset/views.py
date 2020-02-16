@@ -123,7 +123,7 @@ class ProblemPost(CreateAPIView):
     @soj_login_required
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
 
 class ProblemPut(APIView):
