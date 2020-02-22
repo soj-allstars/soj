@@ -12,6 +12,7 @@ from rest_framework.decorators import api_view
 from contest.models import Contest
 from problemset.views import ProblemList
 from common.utils import soj_login_required
+from common.consts import ContestCategory
 
 
 class ContestList(ListAPIView):
@@ -50,19 +51,40 @@ class ContestDetail(RetrieveAPIView):
         return Response(data)
 
 
-@soj_login_required
 @api_view(['POST'])
+@soj_login_required
+def verify_password(request, contest_id):
+    password = request.POST['password']
+    contest = Contest.objects.get(id=contest_id)
+    if contest.category != ContestCategory.PRIVATE:
+        return Response({'detail': "干"}, status=status.HTTP_403_FORBIDDEN)
+
+    return Response({'ok': password == contest.password})
+
+
+@api_view(['POST'])
+@soj_login_required
 def register_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
+    if contest.category != ContestCategory.REGISTER:
+        return Response({'detail': "你想干嘛"}, status=status.HTTP_403_FORBIDDEN)
+    if contest.is_started:
+        return Response({'detail': "开始了不准 register！"}, status=status.HTTP_403_FORBIDDEN)
+
     contest.users.add(request.user)
 
     return Response()
 
 
-@soj_login_required
 @api_view(['POST'])
+@soj_login_required
 def unregister_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
+    if contest.category != ContestCategory.REGISTER:
+        return Response({'detail': "你想干嘛"}, status=status.HTTP_403_FORBIDDEN)
+    if contest.is_started:
+        return Response({'detail': "开始了不准 unregister！"}, status=status.HTTP_403_FORBIDDEN)
+
     contest.users.remove(request.user)
 
     return Response()

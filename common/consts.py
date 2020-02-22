@@ -57,6 +57,7 @@ class ContestCategory(IntEnum):
     OPEN = 0
     PRIVATE = 1
     REGISTER = 2
+    SOLO = 3
 
 
 PENALTY_FOR_ONE = 20 * 60

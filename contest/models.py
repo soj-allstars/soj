@@ -20,6 +20,10 @@ class Contest(Model):
     password = models.CharField(max_length=50, null=True, blank=True)
 
     @property
+    def is_started(self):
+        return timezone.now() >= self.start_time
+
+    @property
     def is_running(self):
         return self.start_time <= timezone.now() <= self.end_time
 

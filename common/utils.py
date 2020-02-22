@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.status import HTTP_403_FORBIDDEN
-from django.http import HttpRequest
+from rest_framework.request import Request
 import os
 
 
@@ -12,7 +12,7 @@ def create_file_to_write(path):
 def soj_login_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         actual_request = request
-        if not isinstance(actual_request, HttpRequest):
+        if not isinstance(actual_request, Request):
             actual_request = args[0]
         if actual_request.user.is_authenticated:
             # if decorated func is a method, then request is self, args[0] is actual request
@@ -24,7 +24,7 @@ def soj_login_required(view_func):
 def soj_superuser_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         actual_request = request
-        if not isinstance(actual_request, HttpRequest):
+        if not isinstance(actual_request, Request):
             actual_request = args[0]
         if actual_request.user.is_superuser:
             # if decorated func is a method, then request is self, args[0] is actual request

@@ -133,8 +133,8 @@ class ProblemPut(APIView):
         raise NotImplementedError
 
 
-@soj_login_required
 @api_view(['POST'])
+@soj_login_required
 def make_problem_visible(request, pid):
     problem = Problem.objects.get(id=pid)
     problem.visible = True

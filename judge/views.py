@@ -8,6 +8,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from common.consts import VerdictResult, PENALTY_FOR_ONE
 from contest.models import Standing
+from contest.consumers import ContestStandings
 
 
 @api_view(['POST'])
@@ -34,7 +35,7 @@ def judge_finished(request):
             return HttpResponse()
 
         standing = Standing.objects.get(contest=related_contest, user=submission.user)
-        penalty = standing.penalties.get(submission.problem_id, 0)
+        penalty = standing.penalties.get(str(submission.problem_id), 0)  # str??!!! shitty JSONField
         if penalty <= 0:
             if submission.verdict == VerdictResult.AC:
                 penalty = related_contest.get_elapsed_time_to(submission.submit_time) + (-penalty) * PENALTY_FOR_ONE
@@ -42,6 +43,12 @@ def judge_finished(request):
                 penalty -= 1
             standing.penalties[submission.problem_id] = penalty
             standing.save(update_fields=['penalties'])
+
+            group_name = ContestStandings.GROUP_NAME_FMT.format(related_contest.id)
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                group_name, {'type': 'contest.send_standings', 'contest_id': related_contest.id}
+            )
 
     return HttpResponse()
 

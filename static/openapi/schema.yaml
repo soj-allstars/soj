@@ -479,6 +479,69 @@ paths:
                     type: string
                     description: one of ['OPEN', 'PRIVATE', 'REGISTER']
           description: ''
+  /api/contest/register/{contest_id}/:
+    post:
+      summary: register a contest, return 200 only if the contest not started
+      operationId: RegisterContest
+      parameters:
+      - name: contest_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+  /api/contest/unregister/{contest_id}/:
+    post:
+      summary: unregister a contest, return 200 only if the contest not started
+      operationId: UnregisterContest
+      parameters:
+      - name: contest_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+  /api/contest/let-me-in/{contest_id}/:
+    post:
+      summary: verify password of a contest
+      operationId: VerifyContestPassword
+      parameters:
+      - name: contest_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      requestBody:
+        description: password needed
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  ok:
+                    type: boolean
+          description: ''
   /api/user/login/:
     post:
       operationId: user_login
