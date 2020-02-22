@@ -7,7 +7,8 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'problem', 'user', 'submit_time', 'contest')
+    list_filter = ('contest', 'problem', 'user', 'submit_time')
 
 
 admin.site.register(UserInfo, UserInfoAdmin)
