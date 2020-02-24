@@ -421,7 +421,7 @@ paths:
                           description: whether the contest is running
                         category:
                           type: string
-                          description: one of ['OPEN', 'PRIVATE', 'REGISTER']
+                          description: one of ["OPEN", "PRIVATE", "REGISTER", "SOLO"]
           description: ''
   /api/contest/{id}/:
     get:

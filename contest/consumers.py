@@ -41,6 +41,8 @@ class ContestStandings(JsonWebsocketConsumer):
             self.send_json({'ok': False, 'detail': str(ex)})
         else:
             self.send_json(message)
+            if not contest.is_running:
+                self.disconnect(1000)
 
     def contest_send_standings(self, event):
         try:

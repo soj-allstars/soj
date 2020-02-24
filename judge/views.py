@@ -34,8 +34,8 @@ def judge_finished(request):
         if not related_contest.is_running:
             return HttpResponse()
 
-        standing = Standing.objects.get(contest=related_contest, user=submission.user)
-        penalty = standing.penalties.get(str(submission.problem_id), 0)  # str??!!! shitty JSONField
+        standing, _ = Standing.objects.get_or_create(contest=related_contest, user=submission.user)
+        penalty = standing.penalties.get(str(submission.problem_id), 0)  # str. because JSON field name must be str.
         if penalty <= 0:
             if submission.verdict == VerdictResult.AC:
                 penalty = related_contest.get_elapsed_time_to(submission.submit_time) + (-penalty) * PENALTY_FOR_ONE
