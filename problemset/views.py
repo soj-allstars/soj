@@ -91,10 +91,12 @@ class ProblemPost(CreateAPIView):
                       'sample_inputs', 'checker_type', 'inputs', 'checker_code',
                       'solution_code', 'solution_lang')
 
-        def create(self, validated_data):  # TODO if sample_inputs get sample_outputs
+        def create(self, validated_data):
             validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
             if not validated_data['sample_inputs']:
                 validated_data['sample_inputs'] = validated_data['inputs'][:2]
+            else:
+                validated_data['inputs'] = validated_data['sample_inputs'] + validated_data['inputs']
             inputs = validated_data.pop('inputs')
             solution_code = validated_data.pop('solution_code')
             solution_lang = validated_data.pop('solution_lang')
@@ -120,21 +122,21 @@ class ProblemPost(CreateAPIView):
 
         return Response({'problem_id': problem.id})
 
-    @soj_login_required
+    @soj_superuser_required
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
 
 class ProblemPut(APIView):
-    @soj_login_required
+    @soj_superuser_required
     @transaction.atomic
     def put(self, request, *args, **kwargs):
         raise NotImplementedError
 
 
 @api_view(['POST'])
-@soj_login_required
+@soj_superuser_required
 def make_problem_visible(request, pid):
     problem = Problem.objects.get(id=pid)
     problem.visible = True

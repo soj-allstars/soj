@@ -2,10 +2,6 @@ from django.contrib import admin
 from problemset.models import Problem, TestCase, Solution
 
 
-class TestCaseInline(admin.StackedInline):
-    model = TestCase
-
-
 class SolutionInline(admin.StackedInline):
     model = Solution
     extra = 0
@@ -13,10 +9,11 @@ class SolutionInline(admin.StackedInline):
 
 class ProblemAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'visible')
-    inlines = [TestCaseInline, SolutionInline]
+    inlines = [SolutionInline]
     list_filter = ('visible',)
 
 
 admin.site.register(Problem, ProblemAdmin)
+admin.site.register(TestCase)
 
 # Register your models here.

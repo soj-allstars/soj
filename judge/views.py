@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from user.models import Submission
-from problemset.models import TestCase
+from problemset.models import TestCase, Problem
 import logging
 import json
 from channels.layers import get_channel_layer
@@ -78,9 +78,13 @@ def check_finished(request):
         }
 
     if solution_res['verdict'] == VerdictResult.AC:
+        outputs = solution_res['outputs']
         test_case = TestCase.objects.get(problem_id=problem_id)
-        test_case.expected_outputs = solution_res['outputs']
-        test_case.save(update_fields=['expected_outputs'])
+        test_case.expected_outputs = outputs
+        test_case.save(update_fields=['expected_outputs'])  # TODO do we need to kill this?
+        problem = Problem.objects.get(id=problem_id)
+        problem.sample_outputs = json.loads(outputs)[:len(problem.sample_inputs)]
+        problem.save(update_fields=['sample_outputs'])
 
         if len(test_case.expected_outputs) != len(test_case.inputs):
             message['solution']['desc'] += "(WTF? The outputs length doesn't match the inputs length?)"
