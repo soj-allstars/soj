@@ -70,8 +70,6 @@ paths:
                     readOnly: true
                   checker_type:
                     type: string
-                  inputs:
-                    type: object
                   solutions:
                     type: array
                     items:
@@ -104,9 +102,15 @@ paths:
                   note:
                     type: string
                   sample_inputs:
-                    type: string
+                    type: array
+                    items:
+                      type: string
+                    description: one item one test case
                   sample_outputs:
-                    type: string
+                    type: array
+                    items:
+                      type: string
+                    description: one item one test case
                   checker_code:
                     type: string
                   visible:
@@ -267,11 +271,6 @@ paths:
                     type: string
                   lang:
                     type: string
-                  outputs:
-                    type: array
-                    description: one item one test case
-                    items:
-                      type: string
           description: ''
   /api/submissions/:
     get:
@@ -333,6 +332,8 @@ paths:
                           maximum: 2147483647
                           minimum: -2147483648
                           description: In KB
+                        lang:
+                          type: string
           description: ''
   /api/submission/:
     post:

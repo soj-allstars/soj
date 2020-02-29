@@ -1,4 +1,4 @@
-from common.consts import LanguageEnum, VerdictResult, CheckerType
+from common.consts import LanguageEnum, CheckerType
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -51,7 +51,6 @@ class ProblemAdminDetail(RetrieveAPIView):
                 fields = ('code', 'lang', 'is_model_solution')
 
         checker_type = CharField(source='get_checker_type_display')
-        inputs = JSONField(source='testcase.inputs')
         solutions = SolutionSerializer(many=True, read_only=True)
 
         class Meta:
@@ -153,10 +152,18 @@ class SubmissionDetail(RetrieveAPIView):
         class Meta:
             model = Submission
             fields = ('verdict', 'memory', 'time', 'submit_time',
-                      'code', 'lang', 'outputs')
+                      'code', 'lang')  # TODO input and output of last wrong case
 
     queryset = Submission.objects.all()
     serializer_class = SubmissionDetailSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        submission = self.get_object()
+        if submission.contest and submission.contest.is_running:
+            if not request.user.is_authenticated or submission.user_id != request.user.id:
+                return Response({'detail': 'how dare you!'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(submission)
+        return Response(serializer.data)
 
 
 class SubmissionPost(APIView):
@@ -167,7 +174,7 @@ class SubmissionPost(APIView):
         code = request.POST['code']
         lang = request.POST['lang']
         contest_id = request.POST.get('contest_id')
-        if contest_id:
+        if contest_id:  # only have contest id when the contest is running
             contest = Contest.objects.get(id=contest_id)
             if not contest.is_running:
                 return Response({'detail': "you can't submit to a contest that's not running"},
@@ -200,7 +207,7 @@ class SubmissionList(ListAPIView):
 
         class Meta:
             model = Submission
-            fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory')
+            fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
 
-    queryset = Submission.objects.all().order_by('-id')
+    queryset = Submission.objects.filter(contest=None).order_by('-id')  # TODO new view for contest submissions
     serializer_class = SubmissionListSerializer

@@ -69,7 +69,7 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': os.environ.get('PAGE_SIZE', 50),
+    'PAGE_SIZE': os.environ.get('PAGE_SIZE', 20),
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -113,6 +113,7 @@ DATABASES = {
         'PASSWORD': 'soj',
         'HOST': '127.0.0.1',
         'PORT': '3306',
+        'OPTIONS': {'charset': 'utf8mb4'},
     }
 }
 
