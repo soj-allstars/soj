@@ -66,7 +66,7 @@ def judge_finished(request):
 
         async_to_sync(channel_layer.group_send)(  # contest
             SubmissionInfo.CONTEST_LIST_GROUP_NAME_FMT.format(
-                contest_id=related_contest.id, user_id=submission.user_id
+                contest_id=related_contest.id
             ),
             {'type': 'submission.send_info', **basic_info}
         )

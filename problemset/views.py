@@ -204,10 +204,12 @@ class SubmissionList(ListAPIView):
     class SubmissionListSerializer(ModelSerializer):
         verdict = CharField(source='get_verdict_display')
         user = StringRelatedField()
+        lang = CharField(source='get_lang_display')
 
         class Meta:
             model = Submission
             fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
 
-    queryset = Submission.objects.filter(contest=None).order_by('-id')  # TODO new view for contest submissions
+    queryset = Submission.objects.filter(contest__isnull=True).order_by('-id')
     serializer_class = SubmissionListSerializer
+    # TODO override get_queryset to do filtering?

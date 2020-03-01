@@ -307,10 +307,10 @@ paths:
                           type: integer
                           readOnly: true
                         problem_id:
-                          type: string
+                          type: integer
                           readOnly: true
                         user_id:
-                          type: string
+                          type: integer
                           readOnly: true
                         user:
                           type: string
@@ -542,6 +542,70 @@ paths:
                 properties:
                   ok:
                     type: boolean
+          description: ''
+  /api/contest/submissions/{contest_id}/:
+    get:
+      summary: get all submissions of a contest
+      operationId: RetrieveContestSubmissionList
+      parameters:
+      - name: contest_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                  next:
+                    type: string
+                    nullable: true
+                  previous:
+                    type: string
+                    nullable: true
+                  results:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          readOnly: true
+                        problem_id:
+                          type: integer
+                          readOnly: true
+                        user_id:
+                          type: integer
+                          readOnly: true
+                        user:
+                          type: string
+                          readOnly: true
+                        verdict:
+                          type: string
+                        submit_time:
+                          type: string
+                          format: date-time
+                          readOnly: true
+                        time:
+                          type: integer
+                          maximum: 2147483647
+                          minimum: -2147483648
+                          description: In ms
+                        memory:
+                          type: integer
+                          maximum: 2147483647
+                          minimum: -2147483648
+                          description: In KB
+                        lang:
+                          type: string
+                      required:
+                      - verdict
+                      - lang
           description: ''
   /api/user/login/:
     post:

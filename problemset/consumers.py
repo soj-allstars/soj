@@ -45,7 +45,7 @@ class SubmissionInfo(JsonWebsocketConsumer):
     DETAIL_GROUP_NAME_FMT = "submission_detail_{submission_id}"
     USER_LIST_GROUP_NAME_FMT = "submission_user_{user_id}"
     ALL_LIST_GROUP_NAME_FMT = "submission_all"
-    CONTEST_LIST_GROUP_NAME_FMT = 'submission_contest_{contest_id}_{user_id}'
+    CONTEST_LIST_GROUP_NAME_FMT = 'submission_contest_{contest_id}'
 
     def connect(self):
         self.accept()
@@ -74,7 +74,7 @@ class SubmissionInfo(JsonWebsocketConsumer):
                 contest_id = content['contest_id']
 
                 async_to_sync(self.channel_layer.group_add)(
-                    self.CONTEST_LIST_GROUP_NAME_FMT.format(contest_id=contest_id, user_id=self.scope["user"].id),
+                    self.CONTEST_LIST_GROUP_NAME_FMT.format(contest_id=contest_id),
                     self.channel_name
                 )
             elif msg_type == 'all':
