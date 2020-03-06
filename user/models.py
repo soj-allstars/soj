@@ -7,8 +7,9 @@ from common.consts import VerdictResult, LanguageEnum
 from contest.models import Contest
 
 
-class UserInfo(Model):
-    pass
+class UserProfile(Model):
+    user = models.OneToOneField(get_user_model(), models.CASCADE)
+    last_visit = models.DateTimeField(auto_now_add=True)
 
 
 class Submission(Model):

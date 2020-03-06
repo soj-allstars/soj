@@ -13,9 +13,9 @@ class Contest(Model):
     problems = models.ManyToManyField(Problem, blank=True)
     description = models.TextField(blank=True)
     users = models.ManyToManyField(get_user_model(), blank=True)
-    start_time = models.DateTimeField()
+    start_time = models.DateTimeField(db_index=True)
     end_time = models.DateTimeField()
-    visible = models.BooleanField(default=False)
+    visible = models.BooleanField(default=False, db_index=True)
     category = models.SmallIntegerField(choices=CATEGORY_CHOICES, default=ContestCategory.OPEN)
     password = models.CharField(max_length=50, null=True, blank=True)
 

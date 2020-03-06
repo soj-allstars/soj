@@ -16,7 +16,7 @@ class Problem(Model):
     sample_outputs = JSONField(default=list)
     checker_type = models.SmallIntegerField(choices=CHECKER_TYPE_CHOICES)
     checker_code = models.TextField(blank=True)
-    visible = models.BooleanField(default=False)
+    visible = models.BooleanField(default=False, db_index=True)
 
     def __str__(self):
         return self.title
@@ -33,3 +33,8 @@ class Solution(Model):
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     is_model_solution = models.BooleanField(default=False)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['problem', 'is_model_solution'], name='unique_problem_model_solution'),
+        ]

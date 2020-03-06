@@ -25,7 +25,7 @@ class ContestList(ListAPIView):
             model = Contest
             fields = ('id', 'name', 'start_time', 'end_time', 'is_running', 'category')
 
-    queryset = Contest.objects.filter(visible=True).order_by('start_time')  # TODO need add index
+    queryset = Contest.objects.filter(visible=True).order_by('start_time')
     serializer_class = ContestListSerializer
 
 

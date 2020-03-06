@@ -1,5 +1,5 @@
 from django.contrib import admin
-from user.models import UserInfo, Submission
+from user.models import UserProfile, Submission
 
 
 class UserInfoAdmin(admin.ModelAdmin):
@@ -11,5 +11,5 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_filter = ('contest', 'problem', 'user', 'submit_time')
 
 
-admin.site.register(UserInfo, UserInfoAdmin)
+admin.site.register(UserProfile, UserInfoAdmin)
 admin.site.register(Submission, SubmissionAdmin)
