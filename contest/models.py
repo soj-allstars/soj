@@ -10,7 +10,7 @@ class Contest(Model):
     CATEGORY_CHOICES = [(t.value, t.name) for t in ContestCategory]
 
     name = models.CharField(max_length=255)
-    problems = models.ManyToManyField(Problem, blank=True)
+    problems = models.ManyToManyField(Problem, through='ContestProblem', blank=True)
     description = models.TextField(blank=True)
     users = models.ManyToManyField(get_user_model(), blank=True)
     start_time = models.DateTimeField(db_index=True)
@@ -41,6 +41,15 @@ class Contest(Model):
 
     def __str__(self):
         return self.name
+
+
+class ContestProblem(Model):
+    contest = models.ForeignKey(Contest, models.CASCADE)
+    problem = models.ForeignKey(Problem, models.CASCADE)
+    problem_order = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ('problem_order',)
 
 
 class Standing(Model):

@@ -6,12 +6,12 @@ from rest_framework.serializers import (
     ModelSerializer,
     CharField,
     StringRelatedField,
+    SerializerMethodField,
 )
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
-from contest.models import Contest
-from problemset.views import ProblemList
+from contest.models import Contest, ContestProblem
 from common.utils import soj_login_required
 from common.consts import ContestCategory
 from user.models import Submission
@@ -25,7 +25,7 @@ class ContestList(ListAPIView):
             model = Contest
             fields = ('id', 'name', 'start_time', 'end_time', 'is_running', 'category')
 
-    queryset = Contest.objects.filter(visible=True).order_by('start_time')
+    queryset = Contest.objects.filter(visible=True).order_by('-start_time')
     serializer_class = ContestListSerializer
 
     def get_data_with_registered_info(self, obj_list, user):
@@ -50,13 +50,20 @@ class ContestList(ListAPIView):
 
 class ContestDetail(RetrieveAPIView):
     class ContestDetailSerializer(ModelSerializer):
-        problems = ProblemList.ProblemListSerializer(many=True, read_only=True)
+        problems = SerializerMethodField()
         category = CharField(source='get_category_display')
 
         class Meta:
             model = Contest
             fields = ('id', 'name', 'description', 'problems',
                       'start_time', 'end_time', 'is_running', 'category')
+
+        def get_problems(self, obj):
+            res = []
+            contest_problems = ContestProblem.objects.select_related('problem').filter(contest=obj).order_by('problem_order')
+            for cp in contest_problems:
+                res.append({'id': cp.problem_id, 'title': cp.problem.title})
+            return res
 
     queryset = Contest.objects.filter(visible=True)
     serializer_class = ContestDetailSerializer
