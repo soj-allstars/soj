@@ -12,7 +12,7 @@ class CheckSolution(JsonWebsocketConsumer):
             return
         self.accept()
 
-    def receive_json(self, content, **kwargs):  # called by receive
+    def receive_json(self, content, **kwargs):  # called by `receive`
         try:
             problem_id = content['problem_id']
 
@@ -50,24 +50,24 @@ class SubmissionInfo(JsonWebsocketConsumer):
     def connect(self):
         self.accept()
 
-    def receive_json(self, content, **kwargs):  # called by receive
+    def receive_json(self, content, **kwargs):  # called by `receive`
         try:
             msg_type = content['type']
-            if msg_type == 'detail':
+            if msg_type == 'detail':  # subscribe to a submission
                 submission_id = content['submission_id']
 
                 async_to_sync(self.channel_layer.group_add)(
                     self.DETAIL_GROUP_NAME_FMT.format(submission_id=submission_id),
                     self.channel_name
                 )
-            elif msg_type == 'user':
+            elif msg_type == 'user':  # subscribe to submissions of a user (without contest submissions)
                 user_id = content['user_id']
 
                 async_to_sync(self.channel_layer.group_add)(
                     self.USER_LIST_GROUP_NAME_FMT.format(user_id=user_id),
                     self.channel_name
                 )
-            elif msg_type == 'contest':
+            elif msg_type == 'contest':  # subscribe to submissions of a contest
                 if not self.scope["user"].is_authenticated:
                     self.close()
                     return
@@ -77,7 +77,7 @@ class SubmissionInfo(JsonWebsocketConsumer):
                     self.CONTEST_LIST_GROUP_NAME_FMT.format(contest_id=contest_id),
                     self.channel_name
                 )
-            elif msg_type == 'all':
+            elif msg_type == 'all':  # subscribe to all submissions of all users (without contest submissions)
                 async_to_sync(self.channel_layer.group_add)(
                     self.ALL_LIST_GROUP_NAME_FMT,
                     self.channel_name

@@ -19,6 +19,12 @@ class Contest(Model):
     category = models.SmallIntegerField(choices=CATEGORY_CHOICES, default=ContestCategory.OPEN)
     password = models.CharField(max_length=50, null=True, blank=True)
 
+    def is_user_registered(self, user):
+        return (
+            user.is_authenticated and
+            user.contest_set.filter(id=self.id).exists()
+        )
+
     @property
     def is_started(self):
         return timezone.now() >= self.start_time

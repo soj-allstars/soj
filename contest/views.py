@@ -28,6 +28,25 @@ class ContestList(ListAPIView):
     queryset = Contest.objects.filter(visible=True).order_by('start_time')
     serializer_class = ContestListSerializer
 
+    def get_data_with_registered_info(self, obj_list, user):
+        registered_list = []
+        for contest in obj_list:
+            registered_list.append(contest.is_user_registered(user))
+        serializer = self.get_serializer(obj_list, many=True)
+        data = serializer.data
+        for entry, registered in zip(data, registered_list):
+            entry['registered'] = registered
+        return data
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(self.get_data_with_registered_info(page, request.user))
+
+        return Response(self.get_data_with_registered_info(queryset, request.user))
+
 
 class ContestDetail(RetrieveAPIView):
     class ContestDetailSerializer(ModelSerializer):
@@ -46,10 +65,7 @@ class ContestDetail(RetrieveAPIView):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
-        data['registered'] = (
-            request.user.is_authenticated and
-            request.user.contest_set.filter(id=instance.id).exists()
-        )
+        data['registered'] = instance.is_user_registered(request.user)
         return Response(data)
 
 
@@ -59,7 +75,7 @@ def verify_password(request, contest_id):
     password = request.POST['password']
     contest = Contest.objects.get(id=contest_id)
     if contest.category != ContestCategory.PRIVATE:
-        return Response({'detail': "干"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
 
     contest.users.add(request.user)
 
@@ -71,7 +87,7 @@ def verify_password(request, contest_id):
 def register_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
     if contest.category != ContestCategory.REGISTER:
-        return Response({'detail': "你想干嘛"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
     if contest.is_started:
         return Response({'detail': "开始了不准 register！"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -85,7 +101,7 @@ def register_contest(request, contest_id):
 def unregister_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
     if contest.category != ContestCategory.REGISTER:
-        return Response({'detail': "你想干嘛"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
     if contest.is_started:
         return Response({'detail': "开始了不准 unregister！"}, status=status.HTTP_403_FORBIDDEN)
 

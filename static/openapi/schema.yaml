@@ -423,6 +423,10 @@ paths:
                         category:
                           type: string
                           description: one of ["OPEN", "PRIVATE", "REGISTER", "SOLO"]
+                        registered:
+                          type: boolean
+                          readOnly: true
+                          description: whether the user is registered to this contest. If the contest category is "PRIVATE", then this field can be used to check whether the user has ever entered the password of this contest.
           description: ''
   /api/contest/{id}/:
     get:
@@ -475,7 +479,7 @@ paths:
                   registered:
                     type: boolean
                     readOnly: true
-                    description: whether the user is registered to this contest
+                    description: whether the user is registered to this contest. If the contest category is "PRIVATE", then this field can be used to check whether the user has ever entered the password of this contest.
                   category:
                     type: string
                     description: one of ['OPEN', 'PRIVATE', 'REGISTER']
