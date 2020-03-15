@@ -16,7 +16,7 @@ class ContestAdmin(admin.ModelAdmin):
 
 
 class StandingAdmin(admin.ModelAdmin):
-    list_display = ('contest', 'penalties', 'user')
+    list_display = ('contest', 'user')
     list_filter = ['contest', 'user']
 
 

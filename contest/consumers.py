@@ -15,9 +15,10 @@ class ContestStandings(JsonWebsocketConsumer):
             one_res = {
                 'user_id': standing.user_id,
                 'username': standing.user.username,
-                'solved_number': sum(1 for _, penalty in standing.penalties.items() if penalty > 0),
-                'total_penalty': sum(penalty for _, penalty in standing.penalties.items() if penalty > 0),
-                'penalties': standing.penalties
+                'solved_number': len(standing.AC_times),
+                'total_penalty': standing.total_penalty,
+                'AC_times': standing.AC_times,
+                'wrong_numbers': standing.wrong_numbers
             }
             result.append(one_res)
 

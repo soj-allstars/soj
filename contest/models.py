@@ -54,8 +54,9 @@ class ContestProblem(Model):
 
 class Standing(Model):
     contest = models.ForeignKey(Contest, models.CASCADE)
-    penalties = JSONField(blank=True, help_text="problem_id:penalty mapping, if penalty is negative, "
-                                                "it represents the number of wrong submissions")
+    AC_times = JSONField(blank=True, help_text="problem_id:AC_time(unit: s) mapping")
+    wrong_numbers = JSONField(blank=True, help_text="problem_id:wrong_submission_number mapping")
+    total_penalty = models.FloatField(default=0, help_text="unit: s")
     user = models.ForeignKey(get_user_model(), models.DO_NOTHING)
 
     class Meta:

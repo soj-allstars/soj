@@ -50,14 +50,21 @@ def judge_finished(request):
     related_contest = submission.contest
     if related_contest:
         standing, _ = Standing.objects.get_or_create(contest=related_contest, user=submission.user)
-        penalty = standing.penalties.get(str(submission.problem_id), 0)  # str. because JSON field name must be str.
-        if penalty <= 0:
+        str_problem_id = str(submission.problem_id)
+
+        AC_time = standing.AC_times.get(str_problem_id)  # str. because JSON field name must be str.
+        wrong_number = standing.wrong_numbers.get(str(str_problem_id), 0)
+        if AC_time is None:  # only update standing info when not AC or very first AC
             if submission.verdict == VerdictResult.AC:
-                penalty = related_contest.get_elapsed_time_to(submission.submit_time) + (-penalty) * PENALTY_FOR_ONE
+                AC_time = related_contest.get_elapsed_time_to(submission.submit_time)
+                penalty = AC_time + wrong_number * PENALTY_FOR_ONE
+
+                standing.AC_times[str_problem_id] = AC_time
+                standing.total_penalty += penalty
             else:
-                penalty -= 1
-            standing.penalties[submission.problem_id] = penalty
-            standing.save(update_fields=['penalties'])
+                wrong_number += 1
+                standing.wrong_numbers[str_problem_id] = wrong_number
+            standing.save()
 
             group_name = ContestStandings.GROUP_NAME_FMT.format(related_contest.id)
             async_to_sync(channel_layer.group_send)(
