@@ -23,7 +23,7 @@ class Submission(Model):
     time = models.IntegerField(help_text='In ms', default=0)
     memory = models.IntegerField(help_text='In KB', default=0)
     verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, default=VerdictResult.PENDING)
-    desc = models.CharField(max_length=255, blank=True)
+    desc = models.TextField(blank=True)
     outputs = JSONField(default=list, blank=True)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True, blank=True)
     contest = models.ForeignKey(Contest, models.DO_NOTHING, null=True, blank=True)

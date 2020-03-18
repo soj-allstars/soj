@@ -26,7 +26,7 @@ from django.conf import settings
 
 def save_input_files(problem_id, inputs):
     for i, test_case in enumerate(inputs):
-        with create_file_to_write(f'{settings.PROBLEM_DATA_DIR}/{problem_id}/{i + 1}_in') as f:
+        with create_file_to_write(f'{settings.PROBLEM_DATA_DIR}/{problem_id}/{i + 1}.in') as f:
             f.write(test_case)
 
 
