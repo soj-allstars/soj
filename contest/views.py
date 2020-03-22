@@ -11,10 +11,13 @@ from rest_framework.serializers import (
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.generics import get_object_or_404
 from contest.models import Contest, ContestProblem
 from common.utils import soj_login_required
 from common.consts import ContestCategory
+from common.permissions import ContestAccessPermission
 from user.models import Submission
+from problemset.views import ProblemDetail
 
 
 class ContestList(ListAPIView):
@@ -74,6 +77,22 @@ class ContestDetail(RetrieveAPIView):
         data = serializer.data
         data['registered'] = instance.is_user_registered(request.user)
         return Response(data)
+
+
+class ContestProblemDetail(RetrieveAPIView):
+    def get_object(self):
+        queryset = self.get_queryset()
+
+        problem_order = ord(self.kwargs['problem_no']) - ord('A') + 1
+        contest_id = self.kwargs['contest_id']
+
+        obj = get_object_or_404(queryset, contest_id=contest_id, problem_order=problem_order)
+        self.check_object_permissions(self.request, obj)
+        return obj.problem
+
+    queryset = ContestProblem.objects.all()
+    serializer_class = ProblemDetail.ProblemDetailSerializer
+    permission_classes = [ContestAccessPermission]
 
 
 @api_view(['POST'])

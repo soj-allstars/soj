@@ -6,6 +6,7 @@ from contest.views import (
     unregister_contest,
     verify_password,
     ContestSubmissionList,
+    ContestProblemDetail
 )
 from contest.consumers import ContestStandings
 
@@ -16,6 +17,7 @@ urlpatterns = [
     path('contest/unregister/<int:contest_id>/', unregister_contest),
     path('contest/let-me-in/<int:contest_id>/', verify_password),
     path('contest/submissions/<int:contest_id>/', ContestSubmissionList.as_view()),
+    path('contest/problem/<int:contest_id>/<str:problem_no>/', ContestProblemDetail.as_view()),
 ]
 
 websocket_urlpatterns = [

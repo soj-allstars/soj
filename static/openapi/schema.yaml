@@ -46,7 +46,10 @@ paths:
                       type: string
                     description: one item one test case
                   note:
-                    type: string
+                    type: array
+                    items:
+                      type: string
+                    description: one item for one sample
           description: ''
   /api/problem/admin/{id}/:
     get:
@@ -100,7 +103,10 @@ paths:
                     minimum: -2147483648
                     description: In KB
                   note:
-                    type: string
+                    type: array
+                    items:
+                      type: string
+                    description: one item for one sample
                   sample_inputs:
                     type: array
                     items:
@@ -187,7 +193,10 @@ paths:
                   minimum: -2147483648
                   description: In KB
                 note:
-                  type: string
+                  type: array
+                  items:
+                    type: string
+                  description: one item for one sample
                 sample_inputs:
                   type: array
                   description: one item one test case
@@ -483,6 +492,52 @@ paths:
                   category:
                     type: string
                     description: one of ['OPEN', 'PRIVATE', 'REGISTER']
+          description: ''
+  /api/contest/problem/{contest_id}/{problem_no}/:
+    get:
+      operationId: RetrieveContestProblem
+      parameters:
+      - name: contest_id
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      - name: problem_no
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  title:
+                    type: string
+                    maxLength: 50
+                  time_limit:
+                    type: integer
+                    description: In ms
+                  memory_limit:
+                    type: integer
+                    description: In KB
+                  description:
+                    type: string
+                  sample_inputs:
+                    type: string
+                  sample_outputs:
+                    type: string
+                  note:
+                    type: array
+                    items:
+                      type: string
+                    description: one item for one sample
+                required:
+                - title
+                - description
           description: ''
   /api/contest/register/{contest_id}/:
     post:
