@@ -13,13 +13,14 @@ from rest_framework.serializers import (
     CharField,
     JSONField,
 )
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from problemset.models import Problem, Solution, TestCase
 from contest.models import Contest
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
-from common.utils import soj_login_required, create_file_to_write, soj_superuser_required
+from common.utils import create_file_to_write
 from django.db import transaction
 from django.conf import settings
 
@@ -59,8 +60,8 @@ class ProblemAdminDetail(RetrieveAPIView):
 
     queryset = Problem.objects.all()
     serializer_class = ProblemAdminSerializer
+    permission_classes = [IsAdminUser]
 
-    @soj_superuser_required
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
@@ -113,6 +114,7 @@ class ProblemPost(CreateAPIView):
             return problem
 
     serializer_class = ProblemPostSerializer
+    permission_classes = [IsAdminUser]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -121,21 +123,21 @@ class ProblemPost(CreateAPIView):
 
         return Response({'problem_id': problem.id})
 
-    @soj_superuser_required
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
 
 
 class ProblemPut(APIView):
-    @soj_superuser_required
+    permission_classes = [IsAdminUser]
+
     @transaction.atomic
     def put(self, request, *args, **kwargs):
         raise NotImplementedError
 
 
 @api_view(['POST'])
-@soj_superuser_required
+@permission_classes([IsAdminUser])
 def make_problem_visible(request, pid):
     problem = Problem.objects.get(id=pid)
     problem.visible = True
@@ -166,8 +168,9 @@ class SubmissionDetail(RetrieveAPIView):
         return Response(serializer.data)
 
 
-class SubmissionPost(APIView):
-    @soj_login_required
+class SubmissionPost(APIView):  # legacy code. TODO: refactor to use GenericView
+    permission_classes = [IsAuthenticated]
+
     @transaction.atomic
     def post(self, request):
         problem_id = request.POST['pid']

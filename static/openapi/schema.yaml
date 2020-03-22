@@ -495,6 +495,7 @@ paths:
           description: ''
   /api/contest/problem/{contest_id}/{problem_no}/:
     get:
+      summary: get a contest problem detail, e.g. /api/contest/problem/1/A/
       operationId: RetrieveContestProblem
       parameters:
       - name: contest_id
@@ -506,7 +507,7 @@ paths:
       - name: problem_no
         in: path
         required: true
-        description: ''
+        description: 'should be an uppercase letter'
         schema:
           type: string
       responses:

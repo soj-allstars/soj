@@ -10,10 +10,10 @@ from rest_framework.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from contest.models import Contest, ContestProblem
-from common.utils import soj_login_required
 from common.consts import ContestCategory
 from common.permissions import ContestAccessPermission
 from user.models import Submission
@@ -70,6 +70,8 @@ class ContestDetail(RetrieveAPIView):
 
     queryset = Contest.objects.filter(visible=True)
     serializer_class = ContestDetailSerializer
+    permission_classes = [ContestAccessPermission]
+    lookup_url_kwarg = 'contest_id'
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -96,7 +98,7 @@ class ContestProblemDetail(RetrieveAPIView):
 
 
 @api_view(['POST'])
-@soj_login_required
+@permission_classes([IsAuthenticated])
 def verify_password(request, contest_id):
     password = request.POST['password']
     contest = Contest.objects.get(id=contest_id)
@@ -109,7 +111,7 @@ def verify_password(request, contest_id):
 
 
 @api_view(['POST'])
-@soj_login_required
+@permission_classes([IsAuthenticated])
 def register_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
     if contest.category != ContestCategory.REGISTER:
@@ -123,7 +125,7 @@ def register_contest(request, contest_id):
 
 
 @api_view(['POST'])
-@soj_login_required
+@permission_classes([IsAuthenticated])
 def unregister_contest(request, contest_id):
     contest = Contest.objects.get(id=contest_id)
     if contest.category != ContestCategory.REGISTER:
@@ -147,21 +149,10 @@ class ContestSubmissionList(ListAPIView):
             fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
 
     serializer_class = SubmissionListSerializer
+    permission_classes = [ContestAccessPermission]
 
     def get_queryset(self):
         contest_id = self.kwargs['contest_id']
         filter_args = {'contest_id': contest_id}
         submissions = Submission.objects.filter(**filter_args)
         return submissions
-
-    def get(self, request, *args, **kwargs):
-        user = request.user
-        contest = Contest.objects.get(id=self.kwargs['contest_id'])
-        if contest.category != ContestCategory.OPEN and (
-            not user.is_authenticated or not user.contest_set.filter(id=contest.id).exists()
-        ):
-            return Response(
-                {'detail': "Either you didn't register to the contest or "
-                           "you never entered the contest"}, status=status.HTTP_403_FORBIDDEN
-            )
-        return super().get(request, *args, **kwargs)

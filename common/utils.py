@@ -9,7 +9,7 @@ def create_file_to_write(path):
     return open(path, 'w')
 
 
-def soj_login_required(view_func):
+def soj_login_required(view_func):  # Deprecated
     def _wrapped_view(request, *args, **kwargs):
         actual_request = request
         if not isinstance(actual_request, Request):
@@ -21,7 +21,7 @@ def soj_login_required(view_func):
     return _wrapped_view
 
 
-def soj_superuser_required(view_func):
+def soj_superuser_required(view_func):  # Deprecated
     def _wrapped_view(request, *args, **kwargs):
         actual_request = request
         if not isinstance(actual_request, Request):

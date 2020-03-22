@@ -7,6 +7,7 @@ class ContestAccessPermission(BasePermission):
     message = ("Either you didn't register to the contest or "
                "you never entered the contest.")
 
+    # TODO add check for SOLO category
     def has_permission(self, request, view):
         user = request.user
         contest = Contest.objects.get(id=view.kwargs['contest_id'])
