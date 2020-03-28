@@ -63,3 +63,23 @@ class Standing(Model):
         constraints = [
             models.UniqueConstraint(fields=['contest', 'user'], name='unique_contest_user'),
         ]
+
+    @property
+    def real_AC_times(self):
+        """:return problem_no:AC_time mapping"""
+        AC_times = {}
+        for problem_id, time in self.AC_times.items():
+            order = ContestProblem.objects.get(contest=self.contest, problem_id=problem_id).problem_order
+            AC_times[chr(ord('A') + order - 1)] = time
+
+        return AC_times
+
+    @property
+    def real_wrong_numbers(self):
+        """:return problem_no:wrong_number mapping"""
+        wrong_numbers = {}
+        for problem_id, number in self.wrong_numbers.items():
+            order = ContestProblem.objects.get(contest=self.contest, problem_id=problem_id).problem_order
+            wrong_numbers[chr(ord('A') + order - 1)] = number
+
+        return wrong_numbers

@@ -17,8 +17,8 @@ class ContestStandings(JsonWebsocketConsumer):
                 'username': standing.user.username,
                 'solved_number': len(standing.AC_times),
                 'total_penalty': standing.total_penalty,
-                'AC_times': standing.AC_times,
-                'wrong_numbers': standing.wrong_numbers
+                'AC_times': standing.real_AC_times,
+                'wrong_numbers': standing.real_wrong_numbers
             }
             result.append(one_res)
 
