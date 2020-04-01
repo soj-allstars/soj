@@ -129,7 +129,7 @@ paths:
           description: ''
   /api/problems/:
     get:
-      summary: get problem list, the page size is currently 50
+      summary: get problem list, the page size is currently 20
       operationId: listProblems
       parameters:
         - name: page
@@ -283,7 +283,7 @@ paths:
           description: ''
   /api/submissions/:
     get:
-      summary: get submission list, the page size is currently 50
+      summary: get submission list, the page size is currently 20
       operationId: listSubmissions
       parameters:
         - name: page
@@ -384,7 +384,7 @@ paths:
           description: ''
   /api/contests/:
     get:
-      summary: get contest list, the page size is currently 50
+      summary: get contest list, the page size is currently 20
       operationId: listContests
       parameters:
       - name: page
@@ -708,4 +708,77 @@ paths:
           content:
             application/json:
               schema: {}
+          description: ''
+  /api/user/register/:
+    post:
+      summary: user register
+      operationId: Createuser_register
+      parameters:
+          - name: username
+            required: true
+            in: query
+            description: ''
+            schema:
+              type: string
+          - name: password
+            required: true
+            in: query
+            description: ''
+            schema:
+              type: string
+          - name: email
+            required: true
+            in: query
+            description: ''
+            schema:
+              type: email
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: 'success'
+        '403':
+          content:
+            application/json:
+              schema: {}
+          description: 'duplicated username'
+  /api/user/check-username/:
+    get:
+      summary: check if the given username has existed
+      operationId: listcheck_usernames
+      parameters:
+        - name: username
+          required: true
+          in: query
+          description: ''
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  ok:
+                    type: boolean
+                    description: true if the username doesn't exist
+          description: ''
+  /api/global-info/:
+    get:
+      summary: global info that may used in every page
+      operationId: listglobal_infos
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                properties:
+                  is_signed_in:
+                    type: boolean
+                    description: true if current used is signed in
+                  username:
+                    type: string
+                    description: username of current user, null if not signed in.
           description: ''
