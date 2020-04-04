@@ -10,7 +10,7 @@ class Problem(Model):
     title = models.CharField(max_length=50)
     description = models.TextField()
     time_limit = models.IntegerField(default=2000, help_text='In ms')
-    memory_limit = models.IntegerField(default=131072, help_text='In KB')
+    memory_limit = models.IntegerField(default=262144, help_text='In KB')
     note = JSONField(default=list, blank=True)
     sample_inputs = JSONField(default=list)
     sample_outputs = JSONField(default=list)

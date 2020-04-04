@@ -33,7 +33,7 @@ def user_logout(request):
 @api_view(['GET'])
 def global_info(request):
     user = request.user
-    is_signed_in = user.is_authenticated
+    is_signed_in = bool(user and user.is_authenticated)
     username = user.username if is_signed_in else None
     return Response({
         'is_signed_in': is_signed_in,
