@@ -22,8 +22,18 @@ def send_judge_request(problem, submission):
     submission.save()
 
 
-def send_check_request(detail):
+def send_check_request(problem, channel_name=None):
+    solution = Solution.objects.get(problem=problem, is_model_solution=True)  # catch exception outside
+
     check_job = settings.CHECK_Q.enqueue(
-        'judge_jobs.check_solution_and_checker', **detail
+        'judge_jobs.check_solution_and_checker',
+        channel_name=channel_name,
+        problem_id=problem.id,
+        solution_code=solution.code,
+        solution_lang=LanguageEnum(solution.lang).name,
+        time_limit=problem.time_limit,
+        memory_limit=problem.memory_limit,
+        sj_code=problem.checker_code if problem.checker_type == CheckerType.special_judge else None,
+        sj_name=f'sj_{problem.id}' if problem.checker_type == CheckerType.special_judge else None,
     )
     return check_job.id

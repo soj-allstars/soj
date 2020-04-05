@@ -126,8 +126,9 @@ def check_finished(request):
         if len(test_case.expected_outputs) != len(test_case.inputs):
             message['solution']['desc'] += "(WTF? The outputs length doesn't match the inputs length?)"
 
-    message['type'] = 'check.send_result'
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.send)(channel_name, message)
+    if channel_name:
+        message['type'] = 'check.send_result'
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.send)(channel_name, message)
 
     return HttpResponse()

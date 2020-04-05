@@ -1,7 +1,6 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from judge.tasks import send_check_request
-from problemset.models import Problem, Solution
-from common.consts import LanguageEnum, CheckerType
+from problemset.models import Problem
 from asgiref.sync import async_to_sync
 
 
@@ -17,21 +16,8 @@ class CheckSolution(JsonWebsocketConsumer):
             problem_id = content['problem_id']
 
             problem = Problem.objects.get(id=problem_id)
-            solution = Solution.objects.get(problem_id=problem_id, is_model_solution=True)
 
-            detail = {
-                'channel_name': self.channel_name,
-                'problem_id': problem_id,
-                'solution_code': solution.code,
-                'solution_lang': LanguageEnum(solution.lang).name,
-                'time_limit': problem.time_limit,
-                'memory_limit': problem.memory_limit,
-            }
-            if problem.checker_type == CheckerType.special_judge:
-                detail['sj_code'] = problem.checker_code
-                detail['sj_name'] = f'sj_{problem.id}'
-
-            send_check_request(detail)
+            send_check_request(problem, self.channel_name)
         except Exception as ex:
             self.send_json({'ok': False, 'detail': str(ex)})
         else:
