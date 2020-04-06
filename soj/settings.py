@@ -31,9 +31,10 @@ ALLOWED_HOSTS = ['*']  # need to change in product
 REDIS = Redis(
     os.environ.get('REDIS_HOST', '127.0.0.1'),
     os.environ.get('REDIS_PORT', 6379),
-    password=os.environ.get('REDIS_PASSWORD', None)
+    db=0,
+    password=os.environ.get('REDIS_PASSWORD', None),
 )
-JUDGE_Q = Queue(connection=REDIS)
+JUDGE_Q = Queue(connection=REDIS, default_timeout=20)
 CHECK_Q = Queue('check', connection=REDIS)
 
 PROBLEM_DATA_DIR = 'shared_data/problems'

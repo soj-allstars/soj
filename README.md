@@ -88,8 +88,8 @@ server {
     #access_log  /var/log/nginx/host.access.log  main;
 
     location / {
-        try_files $uri @proxy_to_app;
         index index.html;
+        try_files $uri $uri/ @proxy_to_app;
     }
     location /static/  {
     }
