@@ -21,6 +21,10 @@ class Problem(Model):
     def __str__(self):
         return self.title
 
+    @property
+    def sj_name(self):
+        return f'sj_{self.id}'
+
 
 class TestCase(Model):
     problem = models.OneToOneField(Problem, models.CASCADE)

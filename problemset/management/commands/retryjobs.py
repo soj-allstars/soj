@@ -4,7 +4,8 @@ from django.utils import timezone
 from user.models import Submission
 from common.consts import VerdictResult
 from rq.job import Job
-from rq.exceptions import InvalidJobOperation
+from rq.exceptions import InvalidJobOperation, NoSuchJobError
+from judge.tasks import send_judge_request
 
 
 class Command(BaseCommand):
@@ -17,7 +18,12 @@ class Command(BaseCommand):
             if (now - s.submit_time).total_seconds() < 30:
                 break
 
-            job = Job.fetch(s.job_id, connection=settings.REDIS)
+            try:
+                job = Job.fetch(s.job_id, connection=settings.REDIS)
+            except NoSuchJobError:
+                send_judge_request(s.problem, s)
+                print(f"submission {s.id} job lost. job id: {s.job_id}. rejudge request send.")
+                continue
             try:
                 job.requeue()
             except InvalidJobOperation:

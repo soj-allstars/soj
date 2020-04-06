@@ -16,10 +16,14 @@ def send_judge_request(problem, submission):
         memory_limit=problem.memory_limit,
         solution_code=solution.code,
         solution_lang=LanguageEnum(solution.lang).name,
-        checker_type=CheckerType(problem.checker_type).name,
+        checker_type=(
+            CheckerType(problem.checker_type).name
+            if problem.checker_type != CheckerType.special_judge
+            else problem.sj_name
+        ),
     )
     submission.job_id = judge_job.id
-    submission.save()
+    submission.save(update_fields=['job_id'])
 
 
 def send_check_request(problem, channel_name=None):
@@ -34,6 +38,6 @@ def send_check_request(problem, channel_name=None):
         time_limit=problem.time_limit,
         memory_limit=problem.memory_limit,
         sj_code=problem.checker_code if problem.checker_type == CheckerType.special_judge else None,
-        sj_name=f'sj_{problem.id}' if problem.checker_type == CheckerType.special_judge else None,
+        sj_name=problem.sj_name if problem.checker_type == CheckerType.special_judge else None,
     )
     return check_job.id
