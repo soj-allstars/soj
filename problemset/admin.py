@@ -10,8 +10,12 @@ class SolutionInline(admin.StackedInline):
     extra = 0
 
 
+class TestCaseAdmin(admin.ModelAdmin):
+    list_display = ('problem', 'problem_id')
+
+
 class ProblemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'visible')
+    list_display = ('id', 'title', 'checker_type', 'visible')
     inlines = [SolutionInline]
     list_filter = ('visible',)
     actions = ['write_inputs_answers']
@@ -26,11 +30,11 @@ class ProblemAdmin(admin.ModelAdmin):
                 self.message_user(request, f"problem {p.id} failed to generate answer. {ex}", level=messages.ERROR)
                 ok = False
         if ok:
-            self.message_user(request, "successfully saved all test case files.")
+            self.message_user(request, "successfully send all requests.")
     write_inputs_answers.short_description = 'generate test case input and answer files'
 
 
 admin.site.register(Problem, ProblemAdmin)
-admin.site.register(TestCase)
+admin.site.register(TestCase, TestCaseAdmin)
 
 # Register your models here.

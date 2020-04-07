@@ -8,8 +8,9 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ('id', 'problem', 'user', 'submit_time', 'contest')
-    list_filter = ('contest', 'problem', 'user', 'submit_time')
+    list_display = ('id', 'problem', 'user', 'verdict', 'submit_time', 'contest')
+    list_filter = ('verdict', 'contest', 'submit_time', 'lang')
+    search_fields = ('user__username', 'problem__title')
     actions = ['rejudge']
 
     def rejudge(self, request, submissions):

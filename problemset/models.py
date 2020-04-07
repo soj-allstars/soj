@@ -36,7 +36,7 @@ class Solution(Model):
     problem = models.ForeignKey(Problem, models.CASCADE, related_name='solutions')
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
-    is_model_solution = models.BooleanField(default=False)
+    is_model_solution = models.BooleanField(null=True, blank=True, default=None, help_text='use None instead of False')
 
     class Meta:
         constraints = [
