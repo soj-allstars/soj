@@ -16,7 +16,7 @@ from rest_framework.serializers import (
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from problemset.models import Problem, Solution, TestCase
-from contest.models import Contest
+from contest.models import Contest, ContestProblem
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
@@ -182,13 +182,14 @@ class SubmissionPost(APIView):  # legacy code. TODO: refactor to use GenericView
             if not contest.is_running:
                 return Response({'detail': "you can't submit to a contest that's not running"},
                                 status.HTTP_403_FORBIDDEN)
-
-        problem = Problem.objects.get(id=problem_id)
+            problem = ContestProblem.objects.get(contest=contest, problem_order=ord(problem_id) - ord('A') + 1).problem
+        else:
+            problem = Problem.objects.get(id=problem_id)
 
         try:
             submission = Submission()
             submission.user = request.user
-            submission.problem_id = problem_id
+            submission.problem_id = problem.id
             submission.code = code
             submission.lang = getattr(LanguageEnum, lang).value
             submission.contest_id = contest_id

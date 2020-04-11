@@ -65,7 +65,7 @@ class ContestDetail(RetrieveAPIView):
             res = []
             contest_problems = ContestProblem.objects.select_related('problem').filter(contest=obj).order_by('problem_order')
             for cp in contest_problems:
-                res.append({'id': cp.problem_id, 'title': cp.problem.title})
+                res.append({'id': cp.problem_order, 'title': cp.problem.title})
             return res
 
     queryset = Contest.objects.filter(visible=True)
@@ -105,9 +105,11 @@ def verify_password(request, contest_id):
     if contest.category != ContestCategory.PRIVATE:
         return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
 
-    contest.users.add(request.user)
+    ok = (password == contest.password)
+    if ok:
+        contest.users.add(request.user)
 
-    return Response({'ok': password == contest.password})
+    return Response({'ok': ok})
 
 
 @api_view(['POST'])

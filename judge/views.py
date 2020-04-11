@@ -31,7 +31,7 @@ def judge_finished(request):
     submission.save()
 
     basic_info = {
-        'id': submit_id,
+        'id': int(submit_id),
         'verdict': VerdictResult(submission.verdict).name,
         'time': submission.time,
         'memory': submission.memory,
