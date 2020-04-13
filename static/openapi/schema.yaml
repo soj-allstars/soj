@@ -280,6 +280,9 @@ paths:
                     type: string
                   lang:
                     type: string
+                  desc:
+                    type: string
+                    description: description of this submission, may be empty
           description: ''
   /api/submissions/:
     get:

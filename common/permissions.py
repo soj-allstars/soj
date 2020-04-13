@@ -16,3 +16,13 @@ class ContestAccessPermission(BasePermission):
         ):
             return False
         return True
+
+
+class SubmissionAccessPermission(BasePermission):
+    message = "HOW DARE YOU!"
+
+    def has_object_permission(self, request, view, submission):
+        if submission.contest and submission.contest.is_running:
+            if not request.user.is_authenticated or submission.user_id != request.user.id:
+                return False
+        return True

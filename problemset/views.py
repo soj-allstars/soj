@@ -1,4 +1,6 @@
-from common.consts import LanguageEnum, CheckerType
+from common.consts import LanguageEnum, CheckerType, VerdictResult
+from common.utils import create_file_to_write
+from common.permissions import SubmissionAccessPermission
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
@@ -12,6 +14,7 @@ from rest_framework.serializers import (
     StringRelatedField,
     CharField,
     JSONField,
+    SerializerMethodField,
 )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -20,7 +23,6 @@ from contest.models import Contest, ContestProblem
 from user.models import Submission
 from judge.tasks import send_judge_request
 import logging
-from common.utils import create_file_to_write
 from django.db import transaction
 from django.conf import settings
 
@@ -150,22 +152,21 @@ class SubmissionDetail(RetrieveAPIView):
     class SubmissionDetailSerializer(ModelSerializer):
         verdict = CharField(source='get_verdict_display')
         lang = CharField(source='get_lang_display')
+        desc = SerializerMethodField()
 
         class Meta:
             model = Submission
             fields = ('verdict', 'memory', 'time', 'submit_time',
-                      'code', 'lang')  # TODO input and output of last wrong case
+                      'code', 'lang', 'desc')  # TODO input and output of last wrong case?
+
+        def get_desc(self, obj):
+            if obj.verdict == VerdictResult.CE:
+                return obj.desc
+            return ""
 
     queryset = Submission.objects.all()
     serializer_class = SubmissionDetailSerializer
-
-    def retrieve(self, request, *args, **kwargs):
-        submission = self.get_object()
-        if submission.contest and submission.contest.is_running:
-            if not request.user.is_authenticated or submission.user_id != request.user.id:
-                return Response({'detail': 'how dare you!'}, status=status.HTTP_403_FORBIDDEN)
-        serializer = self.get_serializer(submission)
-        return Response(serializer.data)
+    permission_classes = [SubmissionAccessPermission]
 
 
 class SubmissionPost(APIView):  # legacy code. TODO: refactor to use GenericView
