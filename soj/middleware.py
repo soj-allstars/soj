@@ -2,6 +2,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import ObjectDoesNotExist
 from django.http.response import JsonResponse
 from rest_framework import status
+import logging
 
 
 class SojMiddleware:
@@ -21,7 +22,7 @@ class SojMiddleware:
         return response
 
     def process_exception(self, request, exception):
-        # caution: this may lead to a bug that is hard to locate
+        # caution: this may lead to bugs hard to locate
         if isinstance(exception, MultiValueDictKeyError):
             return JsonResponse({'detail': f'hi, you missed {exception} parameter.'},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -29,3 +30,5 @@ class SojMiddleware:
         if isinstance(exception, ObjectDoesNotExist):
             return JsonResponse({'detail': f'hi, corresponding {exception} please ensure the *id you passed is correct.'},
                                 status=status.HTTP_404_NOT_FOUND)
+        logging.error(exception, exc_info=True)
+        return JsonResponse({'detail': str(exception)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

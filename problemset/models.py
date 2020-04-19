@@ -8,7 +8,9 @@ class Problem(Model):
     CHECKER_TYPE_CHOICES = [(t.value, t.name) for t in CheckerType]
 
     title = models.CharField(max_length=50)
-    description = models.TextField()
+    description = models.TextField(blank=True)
+    input_desc = models.TextField(blank=True)
+    output_desc = models.TextField(blank=True)
     time_limit = models.IntegerField(default=2000, help_text='In ms')
     memory_limit = models.IntegerField(default=262144, help_text='In KB')
     note = JSONField(default=list, blank=True)

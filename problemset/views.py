@@ -1,4 +1,4 @@
-from common.consts import LanguageEnum, CheckerType, VerdictResult
+from common.consts import LanguageEnum, CheckerType, VerdictResult, ContestCategory
 from common.utils import create_file_to_write
 from common.permissions import SubmissionAccessPermission
 from rest_framework.response import Response
@@ -22,7 +22,6 @@ from problemset.models import Problem, Solution, TestCase
 from contest.models import Contest, ContestProblem
 from user.models import Submission
 from judge.tasks import send_judge_request
-import logging
 from django.db import transaction
 from django.conf import settings
 
@@ -63,9 +62,6 @@ class ProblemAdminDetail(RetrieveAPIView):
     queryset = Problem.objects.all()
     serializer_class = ProblemAdminSerializer
     permission_classes = [IsAdminUser]
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
 
 class ProblemList(ListAPIView):
@@ -183,24 +179,22 @@ class SubmissionPost(APIView):  # legacy code. TODO: refactor to use GenericView
             if not contest.is_running:
                 return Response({'detail': "you can't submit to a contest that's not running"},
                                 status.HTTP_403_FORBIDDEN)
+            if contest.category != ContestCategory.OPEN and not contest.is_user_registered(request.user):
+                return Response({'detail': "you have no permission to submit to this contest"},
+                                status.HTTP_403_FORBIDDEN)
             problem = ContestProblem.objects.get(contest=contest, problem_order=ord(problem_id) - ord('A') + 1).problem
         else:
             problem = Problem.objects.get(id=problem_id)
 
-        try:
-            submission = Submission()
-            submission.user = request.user
-            submission.problem_id = problem.id
-            submission.code = code
-            submission.lang = getattr(LanguageEnum, lang).value
-            submission.contest_id = contest_id
-            submission.save()
+        submission = Submission()
+        submission.user = request.user
+        submission.problem_id = problem.id
+        submission.code = code
+        submission.lang = getattr(LanguageEnum, lang).value
+        submission.contest_id = contest_id
+        submission.save()
 
-            send_judge_request(problem, submission)
-        except Exception as exception:
-            logging.error(f'[SubmissionPost] {exception=}')
-            return Response({'detail': 'something went wrong, please roast yjp.'},
-                            status.HTTP_500_INTERNAL_SERVER_ERROR)
+        send_judge_request(problem, submission)
 
         return Response({'submission_id': submission.id})
 

@@ -50,11 +50,11 @@ def judge_finished(request):
     related_contest = submission.contest
     if related_contest:
         standing, _ = Standing.objects.get_or_create(contest=related_contest, user=submission.user)
-        str_problem_id = str(submission.problem_id)
+        str_problem_id = str(submission.problem_id)  # because JSON field name must be str.
 
-        AC_time = standing.AC_times.get(str_problem_id)  # str. because JSON field name must be str.
-        wrong_number = standing.wrong_numbers.get(str(str_problem_id), 0)
-        if AC_time is None:  # only update standing info when not AC or very first AC
+        AC_time = standing.AC_times.get(str_problem_id)
+        wrong_number = standing.wrong_numbers.get(str_problem_id, 0)
+        if AC_time is None:  # only update standing info when not AC or the on the very first AC
             if submission.verdict == VerdictResult.AC:
                 AC_time = related_contest.get_elapsed_time_to(submission.submit_time)
                 penalty = AC_time + wrong_number * PENALTY_FOR_ONE

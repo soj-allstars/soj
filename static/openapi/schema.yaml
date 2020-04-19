@@ -639,9 +639,10 @@ paths:
                         id:
                           type: integer
                           readOnly: true
-                        problem_id:
-                          type: integer
+                        problem_no:
+                          type: string
                           readOnly: true
+                          description: an uppercase letter
                         user_id:
                           type: integer
                           readOnly: true

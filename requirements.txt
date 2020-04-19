@@ -1,6 +1,6 @@
 channels
 channels-redis
-daphne
+uvicorn
 Django<3.0
 django-admin-sortable2
 django-cors-headers

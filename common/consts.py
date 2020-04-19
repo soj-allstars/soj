@@ -3,7 +3,7 @@ from enum import IntEnum, unique
 
 @unique
 class CheckerType(IntEnum):
-    same = 0
+    same = 0  # not used
     acmp = 1
     caseicmp = 2
     casencmp = 3
@@ -48,8 +48,7 @@ class LanguageEnum(IntEnum):
     JAVA = 3
     CPY = 4
     PYPY = 5
-    GO = 6
-    JS = 7
+    RACKET = 6
 
 
 @unique
@@ -57,7 +56,7 @@ class ContestCategory(IntEnum):
     OPEN = 0
     PRIVATE = 1
     REGISTER = 2
-    SOLO = 3
+    SOLO = 3  # not used yet
 
 
 PENALTY_FOR_ONE = 20 * 60

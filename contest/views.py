@@ -23,43 +23,30 @@ from problemset.views import ProblemDetail
 class ContestList(ListAPIView):
     class ContestListSerializer(ModelSerializer):
         category = CharField(source='get_category_display')
+        registered = SerializerMethodField()
 
         class Meta:
             model = Contest
-            fields = ('id', 'name', 'start_time', 'end_time', 'is_running', 'category')
+            fields = ('id', 'name', 'start_time', 'end_time', 'is_running', 'category', 'registered')
+
+        def get_registered(self, obj):
+            user = self.context['request'].user
+            return obj.is_user_registered(user)
 
     queryset = Contest.objects.filter(visible=True).order_by('-start_time')
     serializer_class = ContestListSerializer
-
-    def get_data_with_registered_info(self, obj_list, user):
-        registered_list = []
-        for contest in obj_list:
-            registered_list.append(contest.is_user_registered(user))
-        serializer = self.get_serializer(obj_list, many=True)
-        data = serializer.data
-        for entry, registered in zip(data, registered_list):
-            entry['registered'] = registered
-        return data
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            return self.get_paginated_response(self.get_data_with_registered_info(page, request.user))
-
-        return Response(self.get_data_with_registered_info(queryset, request.user))
 
 
 class ContestDetail(RetrieveAPIView):
     class ContestDetailSerializer(ModelSerializer):
         problems = SerializerMethodField()
         category = CharField(source='get_category_display')
+        registered = SerializerMethodField()
 
         class Meta:
             model = Contest
             fields = ('id', 'name', 'description', 'problems',
-                      'start_time', 'end_time', 'is_running', 'category')
+                      'start_time', 'end_time', 'is_running', 'category', 'registered')
 
         def get_problems(self, obj):
             res = []
@@ -68,17 +55,14 @@ class ContestDetail(RetrieveAPIView):
                 res.append({'id': cp.problem_order, 'title': cp.problem.title})
             return res
 
+        def get_registered(self, obj):
+            user = self.context['request'].user
+            return obj.is_user_registered(user)
+
     queryset = Contest.objects.filter(visible=True)
     serializer_class = ContestDetailSerializer
     permission_classes = [ContestAccessPermission]
     lookup_url_kwarg = 'contest_id'
-
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
-        data = serializer.data
-        data['registered'] = instance.is_user_registered(request.user)
-        return Response(data)
 
 
 class ContestProblemDetail(RetrieveAPIView):
@@ -107,6 +91,7 @@ def verify_password(request, contest_id):
 
     ok = (password == contest.password)
     if ok:
+        # once a user entered the password, he/she can access the contest without entering the password any more
         contest.users.add(request.user)
 
     return Response({'ok': ok})
@@ -119,7 +104,7 @@ def register_contest(request, contest_id):
     if contest.category != ContestCategory.REGISTER:
         return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
     if contest.is_started:
-        return Response({'detail': "开始了不准 register！"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'detail': "不准 register！"}, status=status.HTTP_403_FORBIDDEN)
 
     contest.users.add(request.user)
 
@@ -133,7 +118,7 @@ def unregister_contest(request, contest_id):
     if contest.category != ContestCategory.REGISTER:
         return Response({'detail': "wrong contest category"}, status=status.HTTP_403_FORBIDDEN)
     if contest.is_started:
-        return Response({'detail': "开始了不准 unregister！"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'detail': "不准 unregister！"}, status=status.HTTP_403_FORBIDDEN)
 
     contest.users.remove(request.user)
 
@@ -145,10 +130,16 @@ class ContestSubmissionList(ListAPIView):
         verdict = CharField(source='get_verdict_display')
         user = StringRelatedField()
         lang = CharField(source='get_lang_display')
+        problem_no = SerializerMethodField()
 
         class Meta:
             model = Submission
-            fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
+            fields = ('id', 'problem_no', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
+
+        def get_problem_no(self, obj):
+            problem_id = obj.problem_id
+            problem_order = ContestProblem.objects.get(contest_id=obj.contest_id, problem_id=problem_id).problem_order
+            return chr(ord('A') + problem_order - 1)
 
     serializer_class = SubmissionListSerializer
     permission_classes = [ContestAccessPermission]
