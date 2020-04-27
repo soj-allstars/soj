@@ -111,15 +111,11 @@ class ProblemPost(CreateAPIView):
 
             return problem
 
+        def to_representation(self, problem):  # used in serializer.data
+            return {'problem_id': problem.id}
+
     serializer_class = ProblemPostSerializer
     permission_classes = [IsAdminUser]
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        problem = serializer.save()
-
-        return Response({'problem_id': problem.id})
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -137,10 +133,7 @@ class ProblemPut(APIView):
 @api_view(['POST'])
 @permission_classes([IsAdminUser])
 def make_problem_visible(request, pid):
-    problem = Problem.objects.get(id=pid)
-    problem.visible = True
-    problem.save(update_fields=['visible'])
-
+    Problem.objects.filter(id=pid).update(visible=True)
     return Response()
 
 

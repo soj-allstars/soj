@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.db.utils import IntegrityError
 
 
@@ -52,6 +54,11 @@ def user_register(request):
     username = request.POST['username']
     password = request.POST['password']
     email = request.POST['email']
+
+    try:
+        validate_email(email)
+    except ValidationError as ex:
+        return Response({'detail': str(ex)}, status=status.HTTP_403_FORBIDDEN)
 
     try:
         new_user = get_user_model().objects.create_user(username, email, password)

@@ -13,7 +13,7 @@ class Problem(Model):
     output_desc = models.TextField(blank=True)
     time_limit = models.IntegerField(default=2000, help_text='In ms')
     memory_limit = models.IntegerField(default=262144, help_text='In KB')
-    note = JSONField(default=list, blank=True)
+    note = models.TextField(blank=True)
     sample_inputs = JSONField(default=list)
     sample_outputs = JSONField(default=list)
     checker_type = models.SmallIntegerField(choices=CHECKER_TYPE_CHOICES)

@@ -18,7 +18,7 @@ class ProblemAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'checker_type', 'visible')
     inlines = [SolutionInline]
     list_filter = ('visible',)
-    actions = ['write_inputs_answers']
+    actions = ['write_inputs_answers', 'mark_as_visible', 'mark_as_invisible']
 
     def write_inputs_answers(self, request, problems):
         ok = True
@@ -31,10 +31,18 @@ class ProblemAdmin(admin.ModelAdmin):
                 ok = False
         if ok:
             self.message_user(request, "successfully send all requests.")
-    write_inputs_answers.short_description = 'generate test case input and answer files'
+    write_inputs_answers.short_description = 'Generate test case input and answer files'
+
+    def mark_as_visible(self, request, problems):
+        problems.update(visible=True)
+        self.message_user(request, 'done.')
+    mark_as_visible.short_description = 'Mark problems as visible'
+
+    def mark_as_invisible(self, request, problems):
+        problems.update(visible=False)
+        self.message_user(request, 'done.')
+    mark_as_invisible.short_description = 'Mark problems as invisible'
 
 
 admin.site.register(Problem, ProblemAdmin)
 admin.site.register(TestCase, TestCaseAdmin)
-
-# Register your models here.

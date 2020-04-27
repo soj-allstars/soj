@@ -17,7 +17,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         for s in submissions:
             send_judge_request(s.problem, s)
         self.message_user(request, "successfully send rejudge requests.")
-    rejudge.short_description = 'rejudge submissions'
+    rejudge.short_description = 'Rejudge submissions'
 
 
 admin.site.register(UserProfile, UserInfoAdmin)

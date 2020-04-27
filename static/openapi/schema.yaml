@@ -46,10 +46,7 @@ paths:
                       type: string
                     description: one item one test case
                   note:
-                    type: array
-                    items:
-                      type: string
-                    description: one item for one sample
+                    type: string
           description: ''
   /api/problem/admin/{id}/:
     get:
@@ -103,10 +100,7 @@ paths:
                     minimum: -2147483648
                     description: In KB
                   note:
-                    type: array
-                    items:
-                      type: string
-                    description: one item for one sample
+                    type: string
                   sample_inputs:
                     type: array
                     items:
@@ -193,10 +187,7 @@ paths:
                   minimum: -2147483648
                   description: In KB
                 note:
-                  type: array
-                  items:
-                    type: string
-                  description: one item for one sample
+                  type: string
                 sample_inputs:
                   type: array
                   description: one item one test case
@@ -216,7 +207,7 @@ paths:
                 solution_lang:
                   type: string
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
@@ -535,10 +526,7 @@ paths:
                   sample_outputs:
                     type: string
                   note:
-                    type: array
-                    items:
-                      type: string
-                    description: one item for one sample
+                    type: string
                 required:
                 - title
                 - description
