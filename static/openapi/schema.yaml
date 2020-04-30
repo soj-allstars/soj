@@ -286,6 +286,12 @@ paths:
           description: A page number within the paginated result set.
           schema:
             type: integer
+        - name: username
+          required: false
+          in: query
+          description: username used to filter the result.
+          schema:
+            type: string
       responses:
         '200':
           content:

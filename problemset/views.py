@@ -204,4 +204,10 @@ class SubmissionList(ListAPIView):
 
     queryset = Submission.objects.filter(contest__isnull=True).order_by('-id')
     serializer_class = SubmissionListSerializer
-    # TODO override get_queryset to do filtering?
+
+    def get_queryset(self):
+        submissions = super().get_queryset()
+        username = self.request.query_params.get('username')
+        if username:
+            submissions = submissions.filter(user__username=username)
+        return submissions

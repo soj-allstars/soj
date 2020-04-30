@@ -1,7 +1,12 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from judge.tasks import send_check_request
 from problemset.models import Problem
+from problemset.views import SubmissionDetail, SubmissionList
+from user.models import Submission
+from common.consts import VerdictResult
+from contest.views import ContestSubmissionList
 from asgiref.sync import async_to_sync
+from django.db import transaction
 
 
 class CheckSolution(JsonWebsocketConsumer):
@@ -33,6 +38,16 @@ class SubmissionInfo(JsonWebsocketConsumer):
     ALL_LIST_GROUP_NAME_FMT = "submission_all"
     CONTEST_LIST_GROUP_NAME_FMT = 'submission_contest_{contest_id}'
 
+    @staticmethod
+    def get_submission_info(submission):
+        return {
+            'id': submission.id,
+            'verdict': VerdictResult(submission.verdict).name,
+            'time': submission.time,
+            'memory': submission.memory,
+            **({'description': submission.desc} if submission.desc else {})
+        }
+
     def connect(self):
         self.accept()
 
@@ -42,10 +57,16 @@ class SubmissionInfo(JsonWebsocketConsumer):
             if msg_type == 'detail':  # subscribe to a submission
                 submission_id = content['submission_id']
 
-                async_to_sync(self.channel_layer.group_add)(
-                    self.DETAIL_GROUP_NAME_FMT.format(submission_id=submission_id),
-                    self.channel_name
-                )
+                with transaction.atomic():
+                    submission = Submission.objects.select_for_update().get(id=submission_id)
+
+                    if submission.verdict != VerdictResult.PENDING:
+                        self.send_json(self.get_submission_info(submission))
+                    else:
+                        async_to_sync(self.channel_layer.group_add)(
+                            self.DETAIL_GROUP_NAME_FMT.format(submission_id=submission_id),
+                            self.channel_name
+                        )
             elif msg_type == 'user':  # subscribe to submissions of a user (without contest submissions)
                 user_id = content['user_id']
 

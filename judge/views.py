@@ -30,12 +30,7 @@ def judge_finished(request):
     submission.outputs = result['outputs']
     submission.save()
 
-    basic_info = {
-        'id': int(submit_id),
-        'verdict': VerdictResult(submission.verdict).name,
-        'time': submission.time,
-        'memory': submission.memory,
-    }
+    basic_info = SubmissionInfo.get_submission_info(submission)
 
     channel_layer = get_channel_layer()
     async_to_sync(channel_layer.group_send)(  # detail
@@ -43,7 +38,6 @@ def judge_finished(request):
         {
             'type': 'submission.send_info',
             **basic_info,
-            **({'description': submission.desc} if submission.desc else {})
         }
     )
 
