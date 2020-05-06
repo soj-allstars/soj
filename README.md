@@ -87,6 +87,14 @@ server {
     #charset koi8-r;
     #access_log  /var/log/nginx/host.access.log  main;
 
+    gzip_static  on;
+    #gzip on;
+    #gzip_min_length 10k;
+    #gzip_comp_level 9;
+    gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript;
+    gzip_vary on;
+    gzip_disable "MSIE [1-6]\.";
+
     location / {
         index index.html;
         try_files $uri $uri/ @proxy_to_app;

@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from contest.models import Contest, ContestProblem
-from common.consts import ContestCategory
+from common.consts import ContestCategory, VerdictResult
 from common.permissions import ContestAccessPermission
 from user.models import Submission
 from problemset.views import ProblemDetail
@@ -49,10 +49,14 @@ class ContestDetail(RetrieveAPIView):
                       'start_time', 'end_time', 'is_running', 'category', 'registered')
 
         def get_problems(self, obj):
+            user = self.context['request'].user
             res = []
             contest_problems = ContestProblem.objects.select_related('problem').filter(contest=obj).order_by('problem_order')
             for cp in contest_problems:
-                res.append({'id': cp.problem_order, 'title': cp.problem.title})
+                is_solved = user.is_authenticated and Submission.objects.filter(
+                    user=user, contest=obj, problem=cp.problem, verdict=VerdictResult.AC
+                ).exists()
+                res.append({'id': cp.problem_order, 'title': cp.problem.title, 'is_solved': is_solved})
             return res
 
         def get_registered(self, obj):
