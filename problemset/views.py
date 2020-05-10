@@ -66,9 +66,18 @@ class ProblemAdminDetail(RetrieveAPIView):
 
 class ProblemList(ListAPIView):
     class ProblemListSerializer(ModelSerializer):
+        is_solved = SerializerMethodField()
+
         class Meta:
             model = Problem
-            fields = ('id', 'title')
+            fields = ('id', 'title', 'is_solved')
+
+        def get_is_solved(self, obj):
+            # TODO: every time when the function called, there is a database hit. need to optimize?
+            user = self.context['request'].user
+            return user.is_authenticated and Submission.objects.filter(
+                user=user, problem=obj, verdict=VerdictResult.AC
+            ).exists()
 
     queryset = Problem.objects.filter(visible=True).order_by('id')
     serializer_class = ProblemListSerializer

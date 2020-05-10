@@ -158,6 +158,9 @@ paths:
                         title:
                           type: string
                           maxLength: 50
+                        is_solved:
+                          type: boolean
+                          description: If current user has already solved this problem.
                       required:
                         - title
           description: ''

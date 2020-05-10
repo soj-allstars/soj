@@ -80,29 +80,28 @@ upstream soj-backend {
 
 server {
     listen       80;
-    #server_name  localhost;
+    # server_name  localhost;
 
     root /var/www;
 
-    #charset koi8-r;
-    #access_log  /var/log/nginx/host.access.log  main;
+    # charset koi8-r;
+    # access_log  /var/log/nginx/host.access.log  main;
 
     gzip_static  on;
-    #gzip on;
-    #gzip_min_length 10k;
-    #gzip_comp_level 9;
+    # gzip on;
+    # gzip_min_length 10k;
+    # gzip_comp_level 9;
     gzip_types text/plain application/javascript application/x-javascript text/css application/xml text/javascript;
     gzip_vary on;
     gzip_disable "MSIE [1-6]\.";
 
     location / {
         index index.html;
-        try_files $uri $uri/ @proxy_to_app;
+        try_files $uri $uri/ /index.html;
     }
     location /static/  {
     }
-
-    location @proxy_to_app {
+    location ~* ^/(ws|api|admin|docs)/? {
         proxy_pass http://soj-backend;
 
         proxy_http_version 1.1;
@@ -116,8 +115,13 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-Host $server_name;
     }
+    location = /favicon.ico {
+    }
 
-    #error_page  404              /404.html;
+    # location @proxy_to_app {
+    # }
+
+    # error_page  404              /404.html;
 
     # redirect server error pages to the static page /50x.html
     #
