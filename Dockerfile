@@ -9,8 +9,8 @@ RUN apk update && apk add --update --no-cache mariadb-connector-c-dev && \
 		musl-dev \
 		libffi-dev \
 		make && \
-    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir --upgrade pip && \
-    pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
     apk del .build-deps
 
 COPY . .
