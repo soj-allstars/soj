@@ -617,6 +617,12 @@ paths:
         description: ''
         schema:
           type: string
+      - name: username
+        required: false
+        in: query
+        description: username used to filter the result.
+        schema:
+          type: string
       responses:
         '200':
           content:
