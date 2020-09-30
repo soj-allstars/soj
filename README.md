@@ -1,4 +1,4 @@
-# soj - STU(Shit) Open Judge
+# soj - STU(Shit) Online Judge
 
 ## Setup
 ### MySQL
