@@ -29,7 +29,7 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_ID=dllm/$IMAGE_NAME
+          IMAGE_ID=${{ secrets.DOCKER_REGISTRY }}/dllm/$IMAGE_NAME
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
