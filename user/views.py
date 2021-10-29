@@ -1,11 +1,16 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.db.utils import IntegrityError
+from user.models import UserProfile
+
+import requests
+
 
 
 @api_view(['POST'])
@@ -23,6 +28,21 @@ def user_login(request):
             request.session.set_expiry(0)
         return Response()
     else:
+        if (
+            not get_user_model().objects.filter(username=username).exists()
+            and settings.COMMUNITY_LOGIN_LINK
+            and settings.COMMUNITY_USER_INFO_LINK
+        ):
+            resp = requests.post(settings.COMMUNITY_LOGIN_LINK, json={'username': username, 'password': password})
+            if resp.status_code == 200 and resp.json()['code'] == 1:
+                cookies = resp.cookies
+                resp = requests.get(settings.COMMUNITY_USER_INFO_LINK, cookies=cookies)
+                if resp.status_code == 200:
+                    user_info = resp.json()['data']
+                    new_user = get_user_model().objects.create_user(username, user_info['mail'], password)
+                    new_user.save()
+                    UserProfile.objects.create(user=new_user, phone=user_info['tel'])
+                    return Response()
         return Response({'detail': '用户名或密码不正确'}, status.HTTP_404_NOT_FOUND)
 
 

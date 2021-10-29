@@ -39,6 +39,9 @@ CHECK_Q = Queue('check', connection=REDIS)
 
 PROBLEM_DATA_DIR = 'shared_data/problems'
 
+COMMUNITY_LOGIN_LINK = os.environ.get('COMMUNITY_LOGIN_LINK', "")
+COMMUNITY_USER_INFO_LINK = os.environ.get('COMMUNITY_USER_INFO_LINK', "")
+
 # Application definition
 
 INSTALLED_APPS = [

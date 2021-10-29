@@ -4,8 +4,9 @@ uvicorn[standard]
 Django<3.0
 django-admin-sortable2
 django-cors-headers
-django-mysql
+django-mysql==3.9.0
 djangorestframework
 mysqlclient
 redis==3.5.2
 rq==1.4.1
+requests

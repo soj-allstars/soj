@@ -9,6 +9,7 @@ from contest.models import Contest
 
 class UserProfile(Model):
     user = models.OneToOneField(get_user_model(), models.CASCADE)
+    phone = models.CharField(max_length=20, blank=True, default="")
     last_visit = models.DateTimeField(auto_now_add=True)
 
 
