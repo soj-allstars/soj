@@ -28,8 +28,9 @@ def user_login(request):
             request.session.set_expiry(0)
         return Response()
     else:
+        username_exists = get_user_model().objects.filter(username=username).exists()
         if (
-            not get_user_model().objects.filter(username=username).exists()
+            not username_exists
             and settings.COMMUNITY_LOGIN_LINK
             and settings.COMMUNITY_USER_INFO_LINK
         ):
@@ -43,7 +44,7 @@ def user_login(request):
                     new_user.save()
                     UserProfile.objects.create(user=new_user, phone=user_info['tel'])
                     return Response()
-        return Response({'detail': '用户名或密码不正确'}, status.HTTP_404_NOT_FOUND)
+        return Response({'detail': '密码不正确' if username_exists else '用户不存在'}, status.HTTP_404_NOT_FOUND)
 
 
 @api_view(['POST'])
