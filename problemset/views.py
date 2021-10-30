@@ -18,12 +18,14 @@ from rest_framework.serializers import (
 )
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from problemset.models import Problem, Solution, TestCase
+from problemset.models import Problem, Solution
 from contest.models import Contest, ContestProblem
 from user.models import Submission
 from judge.tasks import send_judge_request
 from django.db import transaction
 from django.conf import settings
+
+import shutil
 
 
 def save_input_files(problem_id, inputs):
@@ -110,12 +112,11 @@ class ProblemPost(CreateAPIView):
 
             problem = Problem(**validated_data)
             problem.save()
-            test_case = TestCase(problem=problem, inputs=inputs, expected_outputs="")
             solution = Solution(problem=problem, code=solution_code,
                                 lang=getattr(LanguageEnum, solution_lang).value, is_model_solution=True)
-            test_case.save()
             solution.save()
 
+            shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem.id}', ignore_errors=True)
             save_input_files(problem.id, inputs)
 
             return problem

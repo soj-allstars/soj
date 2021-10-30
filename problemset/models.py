@@ -28,12 +28,6 @@ class Problem(Model):
         return f'sj_{self.id}'
 
 
-class TestCase(Model):
-    problem = models.OneToOneField(Problem, models.CASCADE)
-    inputs = JSONField(default=list)
-    expected_outputs = JSONField(default=list)
-
-
 class Solution(Model):
     problem = models.ForeignKey(Problem, models.CASCADE, related_name='solutions')
     code = models.TextField()
