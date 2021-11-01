@@ -2,6 +2,8 @@ from .settings import *
 
 DEBUG = False
 
+SECRET_KEY = os.environ.get('SECRET_KEY', '-h0m96a@zxm57o_wej@b^dq-+jsmx9o1v2z++k)yq8^i*1+f9g')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -33,3 +35,5 @@ CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'shared_data/static_files')
+
+LOGGING = {}

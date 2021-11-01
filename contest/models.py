@@ -21,6 +21,7 @@ class Contest(Model):
 
     def is_user_registered(self, user):
         return (
+            self.category == ContestCategory.REGISTER and
             user.is_authenticated and
             user.contest_set.filter(id=self.id).exists()
         )

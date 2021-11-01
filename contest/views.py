@@ -52,10 +52,13 @@ class ContestDetail(RetrieveAPIView):
             user = self.context['request'].user
             res = []
             contest_problems = ContestProblem.objects.select_related('problem').filter(contest=obj).order_by('problem_order')
+            ac_problems = set(
+                Submission.objects.values_list('problem_id', flat=True).filter(
+                    user=user, contest=obj, problem__in=[cp.problem_id for cp in contest_problems], verdict=VerdictResult.AC
+                )
+            )
             for cp in contest_problems:
-                is_solved = user.is_authenticated and Submission.objects.filter(
-                    user=user, contest=obj, problem=cp.problem, verdict=VerdictResult.AC
-                ).exists()
+                is_solved = user.is_authenticated and cp.problem_id in ac_problems
                 res.append({'id': cp.problem_order, 'title': cp.problem.title, 'is_solved': is_solved})
             return res
 

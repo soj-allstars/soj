@@ -10,6 +10,7 @@ from rest_framework.generics import (
     CreateAPIView,
 )
 from rest_framework.serializers import (
+    ListSerializer,
     ModelSerializer,
     StringRelatedField,
     CharField,
@@ -67,22 +68,31 @@ class ProblemAdminDetail(RetrieveAPIView):
 
 
 class ProblemList(ListAPIView):
-    class ProblemListSerializer(ModelSerializer):
+    class ProblemSerializer(ModelSerializer):
         is_solved = SerializerMethodField()
 
         class Meta:
+            class ListSerializer(ListSerializer):
+                def to_representation(self, data):
+                    self.child.is_solved_set = set(
+                        Submission.objects.values_list('problem_id', flat=True).filter(
+                            user=self.context['request'].user, problem__in=data, verdict=VerdictResult.AC
+                        )
+                    )
+                    return super().to_representation(data)
+
             model = Problem
             fields = ('id', 'title', 'is_solved')
+            # https://www.django-rest-framework.org/api-guide/serializers/#customizing-listserializer-behavior
+            # Have to do it this way, to actually overrite to_representation()
+            list_serializer_class = ListSerializer
 
         def get_is_solved(self, obj):
-            # TODO: every time when the function called, there is a database hit. need to optimize?
             user = self.context['request'].user
-            return user.is_authenticated and Submission.objects.filter(
-                user=user, problem=obj, verdict=VerdictResult.AC
-            ).exists()
+            return user.is_authenticated and obj.id in self.is_solved_set
 
     queryset = Problem.objects.filter(visible=True).order_by('id')
-    serializer_class = ProblemListSerializer
+    serializer_class = ProblemSerializer
 
 
 class ProblemPost(CreateAPIView):
@@ -168,7 +178,7 @@ class SubmissionDetail(RetrieveAPIView):
     permission_classes = [SubmissionAccessPermission]
 
 
-class SubmissionPost(APIView):  # legacy code. TODO: refactor to use GenericView
+class SubmissionPost(APIView):
     permission_classes = [IsAuthenticated]
 
     @transaction.atomic
@@ -212,7 +222,7 @@ class SubmissionList(ListAPIView):
             model = Submission
             fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
 
-    queryset = Submission.objects.filter(contest__isnull=True).order_by('-id')
+    queryset = Submission.objects.select_related('user').filter(contest__isnull=True).order_by('-id')
     serializer_class = SubmissionListSerializer
 
     def get_queryset(self):
