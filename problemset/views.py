@@ -91,7 +91,7 @@ class ProblemList(ListAPIView):
             user = self.context['request'].user
             return user.is_authenticated and obj.id in self.is_solved_set
 
-    queryset = Problem.objects.filter(visible=True).order_by('id')
+    queryset = Problem.objects.only('id', 'title').filter(visible=True).order_by('id')
     serializer_class = ProblemSerializer
 
 
@@ -173,7 +173,7 @@ class SubmissionDetail(RetrieveAPIView):
                 return obj.desc
             return ""
 
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.defer('outputs').all()
     serializer_class = SubmissionDetailSerializer
     permission_classes = [SubmissionAccessPermission]
 
@@ -222,7 +222,10 @@ class SubmissionList(ListAPIView):
             model = Submission
             fields = ('id', 'problem_id', 'user_id', 'user', 'verdict', 'submit_time', 'time', 'memory', 'lang')
 
-    queryset = Submission.objects.select_related('user').filter(contest__isnull=True).order_by('-id')
+    queryset = (
+        Submission.objects.defer('code', 'desc', 'outputs', 'job_id').select_related('user')
+        .filter(contest__isnull=True).order_by('-id')
+    )
     serializer_class = SubmissionListSerializer
 
     def get_queryset(self):

@@ -153,7 +153,10 @@ class ContestSubmissionList(ListAPIView):
 
     def get_queryset(self):
         contest_id = self.kwargs['contest_id']
-        submissions = Submission.objects.filter(contest_id=contest_id).order_by('-id')
+        submissions = (
+            Submission.objects.defer('code', 'desc', 'outputs', 'job_id')
+            .filter(contest_id=contest_id).order_by('-id')
+        )
 
         username = self.request.query_params.get('username')
         if username:
