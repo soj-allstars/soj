@@ -78,7 +78,7 @@ class ProblemList(ListAPIView):
                         Submission.objects.values_list('problem_id', flat=True).filter(
                             user=self.context['request'].user, problem__in=data, verdict=VerdictResult.AC
                         )
-                    )
+                    ) if self.context['request'].user.is_authenticated else set()
                     return super().to_representation(data)
 
             model = Problem
