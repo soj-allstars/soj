@@ -16,8 +16,8 @@ class UserProfile(Model):
 class Submission(Model):
     VERDICT_CHOICES = [(v.value, v.name) for v in VerdictResult]
 
-    user = models.ForeignKey(get_user_model(), models.DO_NOTHING)
-    problem = models.ForeignKey(Problem, models.DO_NOTHING)
+    user = models.ForeignKey(get_user_model(), models.CASCADE)
+    problem = models.ForeignKey(Problem, models.CASCADE)
     submit_time = models.DateTimeField(auto_now_add=True)
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
@@ -27,7 +27,7 @@ class Submission(Model):
     desc = models.TextField(blank=True)
     outputs = JSONField(default=list, blank=True)
     job_id = models.CharField(max_length=50, help_text='The job id in RQ', null=True, blank=True)
-    contest = models.ForeignKey(Contest, models.DO_NOTHING, null=True, blank=True)
+    contest = models.ForeignKey(Contest, models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f'{self.user.username}: {self.problem.title}'

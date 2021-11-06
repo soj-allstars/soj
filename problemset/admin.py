@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.contrib import messages
+from django.conf import settings
 from problemset.models import Problem, Solution
 from judge.tasks import send_check_request
+
+import shutil
 
 
 class SolutionInline(admin.StackedInline):
@@ -36,6 +39,17 @@ class ProblemAdmin(admin.ModelAdmin):
         problems.update(visible=False)
         self.message_user(request, 'done.')
     mark_as_invisible.short_description = 'Mark problems as invisible'
+
+    def delete_model(self, request, obj) -> None:
+        problem_id = obj.id
+        super().delete_model(request, obj)
+        shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem_id}', ignore_errors=True)
+
+    def delete_queryset(self, request, queryset) -> None:
+        problem_ids = [obj.id for obj in queryset]
+        super().delete_queryset(request, queryset)
+        for problem_id in problem_ids:
+            shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem_id}', ignore_errors=True)
 
 
 admin.site.register(Problem, ProblemAdmin)

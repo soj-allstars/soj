@@ -110,7 +110,7 @@ def check_finished(request):
 
     if solution_res['verdict'] == VerdictResult.AC:
         outputs = solution_res['outputs']
-        problem = Problem.objects.get(id=problem_id)
+        problem = Problem.objects.only('sample_inputs').get(id=problem_id)
         problem.sample_outputs = outputs[:len(problem.sample_inputs)]
         problem.save(update_fields=['sample_outputs'])
 

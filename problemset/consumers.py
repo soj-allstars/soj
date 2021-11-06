@@ -1,17 +1,16 @@
 from channels.generic.websocket import JsonWebsocketConsumer
 from judge.tasks import send_check_request
 from problemset.models import Problem
-from problemset.views import SubmissionDetail, SubmissionList
 from user.models import Submission
 from common.consts import VerdictResult
-from contest.views import ContestSubmissionList
 from asgiref.sync import async_to_sync
 from django.db import transaction
 
 
 class CheckSolution(JsonWebsocketConsumer):
     def connect(self):
-        if not self.scope["user"].is_authenticated:
+        user = self.scope["user"]
+        if not user.is_authenticated or not user.is_staff:
             self.close()
             return
         self.accept()

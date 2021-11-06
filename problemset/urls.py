@@ -8,6 +8,7 @@ from problemset.views import (
     ProblemPost,
     make_problem_visible,
     ProblemAdminDetail,
+    ProblemPut,
 )
 from problemset.consumers import CheckSolution, SubmissionInfo
 
@@ -19,6 +20,7 @@ urlpatterns = [
     path('submission/', SubmissionPost.as_view()),
     path('submissions/', SubmissionList.as_view()),
     path('problem/save/', ProblemPost.as_view()),
+    path('problem/save/<int:pk>/', ProblemPut.as_view()),
     path('problem/publish/<int:pid>/', make_problem_visible),
 ]
 

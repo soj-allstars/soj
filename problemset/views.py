@@ -8,6 +8,7 @@ from rest_framework.generics import (
     RetrieveAPIView,
     ListAPIView,
     CreateAPIView,
+    UpdateAPIView,
 )
 from rest_framework.serializers import (
     ListSerializer,
@@ -142,12 +143,54 @@ class ProblemPost(CreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-class ProblemPut(APIView):
+class ProblemPut(UpdateAPIView):
+    class ProblemPutSerializer(ModelSerializer):
+        inputs = JSONField()
+        sample_inputs = JSONField()
+        solution_code = CharField()
+        solution_lang = CharField()
+        checker_type = CharField()
+        checker_code = CharField(allow_blank=True)
+
+        class Meta:
+            model = Problem
+            fields = ('id', 'title', 'description', 'time_limit', 'memory_limit', 'note',
+                      'sample_inputs', 'checker_type', 'inputs', 'checker_code',
+                      'solution_code', 'solution_lang')
+
+        def update(self, problem, validated_data):
+            validated_data['checker_type'] = getattr(CheckerType, validated_data['checker_type']).value
+            if not validated_data['sample_inputs']:
+                validated_data['sample_inputs'] = validated_data['inputs'][:2]
+            else:
+                validated_data['inputs'] = validated_data['sample_inputs'] + validated_data['inputs']
+            inputs = validated_data.pop('inputs')
+            solution_code = validated_data.pop('solution_code')
+            solution_lang = validated_data.pop('solution_lang')
+
+            for k, v in validated_data.items():
+                setattr(problem, k, v)
+            problem.save()
+
+            Solution.objects.filter(problem=problem, is_model_solution=True).update(
+                code=solution_code, lang=getattr(LanguageEnum, solution_lang).value
+            )
+
+            shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem.id}', ignore_errors=True)
+            save_input_files(problem.id, inputs)
+
+            return problem
+
+        def to_representation(self, problem):  # used in serializer.data
+            return {'problem_id': problem.id}
+
+    queryset = Problem.objects.all()
+    serializer_class = ProblemPutSerializer
     permission_classes = [IsAdminUser]
 
     @transaction.atomic
     def put(self, request, *args, **kwargs):
-        raise NotImplementedError
+        return super().put(request, *args, **kwargs)
 
 
 @api_view(['POST'])

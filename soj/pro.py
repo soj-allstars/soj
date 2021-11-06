@@ -34,6 +34,4 @@ CHANNEL_LAYERS = {
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ALLOW_CREDENTIALS = False
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'shared_data/static_files')
-
 LOGGING = {}
