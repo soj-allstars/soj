@@ -1,6 +1,6 @@
 from django_mysql.models import Model
 from django.db import models
-from common.consts import CheckerType, LanguageEnum
+from common.consts import CheckerType, LanguageEnum, VerdictResult
 from django_mysql.models.fields import JSONField
 
 
@@ -29,10 +29,13 @@ class Problem(Model):
 
 
 class Solution(Model):
+    VERDICT_CHOICES = [(v.value, v.name) for v in VerdictResult]
+
     problem = models.ForeignKey(Problem, models.CASCADE, related_name='solutions')
     code = models.TextField()
     lang = models.SmallIntegerField(choices=[(t.value, t.name) for t in LanguageEnum])
     is_model_solution = models.BooleanField(null=True, blank=True, default=None, help_text='use None instead of False')
+    verdict = models.SmallIntegerField(choices=VERDICT_CHOICES, default=VerdictResult.AC)
 
     class Meta:
         constraints = [

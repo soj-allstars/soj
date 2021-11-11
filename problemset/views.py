@@ -123,8 +123,13 @@ class ProblemPost(CreateAPIView):
 
             problem = Problem(**validated_data)
             problem.save()
-            solution = Solution(problem=problem, code=solution_code,
-                                lang=getattr(LanguageEnum, solution_lang).value, is_model_solution=True)
+            solution = Solution(
+                problem=problem,
+                code=solution_code,
+                lang=getattr(LanguageEnum, solution_lang).value,
+                is_model_solution=True,
+                verdict=VerdictResult.PENDING,
+            )
             solution.save()
 
             shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem.id}', ignore_errors=True)

@@ -19,6 +19,10 @@ class SubmissionAdmin(admin.ModelAdmin):
         self.message_user(request, "successfully send rejudge requests.")
     rejudge.short_description = 'Rejudge submissions'
 
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return queryset.defer('code', 'outputs', 'desc')
+
 
 admin.site.register(UserProfile, UserInfoAdmin)
 admin.site.register(Submission, SubmissionAdmin)

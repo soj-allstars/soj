@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from user.models import Submission
-from problemset.models import Problem
+from problemset.models import Problem, Solution
 from problemset.consumers import SubmissionInfo
 import logging
 import json
@@ -102,9 +102,9 @@ def check_finished(request):
     }
     if checker_res:
         message['checker'] = {
-            'verdict': VerdictResult(checker_res['verdict']).name,
-            'time_used': checker_res['time_usage'],
-            'memory_used': checker_res['memory_usage'],
+            'verdict': VerdictResult(checker_res['result']).name,
+            'time_used': checker_res['timeused'],
+            'memory_used': checker_res['memoryused'],
             'desc': str(checker_res.get('desc', ''))
         }
 
@@ -114,6 +114,9 @@ def check_finished(request):
         problem.sample_outputs = outputs[:len(problem.sample_inputs)]
         problem.save(update_fields=['sample_outputs'])
 
+    Solution.objects.filter(problem_id=problem_id, is_model_solution=True).update(
+        verdict=solution_res['verdict']
+    )
     if channel_name:
         message['type'] = 'check.send_result'
         channel_layer = get_channel_layer()
