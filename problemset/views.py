@@ -31,6 +31,7 @@ import shutil
 
 
 def save_input_files(problem_id, inputs):
+    shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem_id}', ignore_errors=True)
     for i, test_case in enumerate(inputs):
         with create_file_to_write(f'{settings.PROBLEM_DATA_DIR}/{problem_id}/{i + 1}.in') as f:
             f.write(test_case)
@@ -132,7 +133,6 @@ class ProblemPost(CreateAPIView):
             )
             solution.save()
 
-            shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem.id}', ignore_errors=True)
             save_input_files(problem.id, inputs)
 
             return problem
@@ -181,7 +181,6 @@ class ProblemPut(UpdateAPIView):
                 code=solution_code, lang=getattr(LanguageEnum, solution_lang).value
             )
 
-            shutil.rmtree(f'{settings.PROBLEM_DATA_DIR}/{problem.id}', ignore_errors=True)
             save_input_files(problem.id, inputs)
 
             return problem
