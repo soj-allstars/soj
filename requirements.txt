@@ -7,6 +7,6 @@ django-cors-headers==3.10.0
 django-mysql==3.9.0
 djangorestframework==3.12.4
 mysqlclient==2.0.3
-redis==3.5.2
+redis==4.4.4
 rq==1.4.1
 requests==2.26.0
